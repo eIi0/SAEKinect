@@ -9,6 +9,10 @@ from vispy.app import MouseEvent,KeyEvent
 from vispy.util import keys
 from vispy.gloo import Program, IndexBuffer
 from vispy.util.transforms import perspective, translate, rotate
+import matplotlib.image as mpimage
+#load textures
+img1 = mpimage.imread('Z:\BUT\SAE Kinect\loopython.png')
+
 
 
 #dessin de primitives
@@ -48,20 +52,57 @@ class Cube_Filaire:
         poslongueur = longueur/2;
         poslargeur = largeur/2;
         posprofondeur = profondeur/2;
-        forme = [[(poslongueur,poslargeur,posprofondeur), (poslongueur,-poslargeur,posprofondeur),(-poslongueur,-poslargeur,posprofondeur),(-poslongueur,poslargeur,posprofondeur)],
-        [(poslongueur,poslargeur,posprofondeur), (poslongueur,poslargeur,-posprofondeur),(poslongueur,-poslargeur,-posprofondeur),(poslongueur,-poslargeur,posprofondeur)],
-        [(poslongueur,poslargeur,-posprofondeur), (poslongueur,-poslargeur,-posprofondeur),(-poslongueur,-poslargeur,-posprofondeur),(-poslongueur,poslargeur,-posprofondeur)],
-        [(-poslongueur,poslargeur,posprofondeur), (-poslongueur,poslargeur,-posprofondeur),(-poslongueur,-poslargeur,-posprofondeur),(-poslongueur,-poslargeur,posprofondeur)]]
-
-       
+        forme = [(-poslongueur,poslargeur,posprofondeur), (poslongueur,poslargeur,posprofondeur),(-poslongueur,-poslargeur,posprofondeur),(poslongueur,-poslargeur,posprofondeur),
+        (-poslongueur,poslargeur,-posprofondeur), (poslongueur,poslargeur,-posprofondeur),(-poslongueur,-poslargeur,-posprofondeur),(poslongueur,-poslargeur,-posprofondeur)]
         self.program = program #le program que l'on va utiliser avec ces shaders
         self.program['position'] = forme
-        self.program['color'] = [(colorR,ColorG,ColorB,1),(colorR,ColorG,ColorB,1),(colorR,ColorG,ColorB,1),(colorR,ColorG,ColorB,1)]; #la couleur de chaque vertex
-        self.carre = IndexBuffer([[0,1],[1,2],[2,3],[3,0]]); # la topologie: ordre des vertex pour le dessin
+        self.program['color'] = [(colorR,ColorG,ColorB,1),(colorR,ColorG,ColorB,1),(colorR,ColorG,ColorB,1),(colorR,ColorG,ColorB,1),(colorR,ColorG,ColorB,1),(colorR,ColorG,ColorB,1),(colorR,ColorG,ColorB,1),(colorR,ColorG,ColorB,1)]; #la couleur de chaque vertex
+        self.carre = IndexBuffer([[0,1],[0,2],[0,4],[5,4],[5,1], [5,7], [3,2] ,[3,7],[3,1],[6,7],[6,2], [6,4]]); # la topologie: ordre des vertex pour le dessin
 
-        
     def draw(self):
         self.program.draw('lines',self.carre)
+
+class TestColorBlueCube:
+    def __init__(self,longueur, largeur, profondeur, colorR, ColorG, ColorB ,program):
+        poslongueur = longueur/2;
+        poslargeur = largeur/2;
+        posprofondeur = profondeur/2;
+        forme = [(-poslongueur,poslargeur,posprofondeur), (poslongueur,poslargeur,posprofondeur),(-poslongueur,-poslargeur,posprofondeur),(poslongueur,-poslargeur,posprofondeur),
+        (-poslongueur,poslargeur,-posprofondeur), (poslongueur,poslargeur,-posprofondeur),(-poslongueur,-poslargeur,-posprofondeur),(poslongueur,-poslargeur,-posprofondeur)]
+        self.program = program #le program que l'on va utiliser avec ces shaders
+        self.program['position'] = forme # les vertex
+        #                               1                          2                            3                     4                       5                       6                       7                           8                         9                       10                          11                      12                          
+        self.program['color'] = [(colorR,ColorG,ColorB,1),(colorR,ColorG,ColorB,1),(colorR,ColorG,ColorB,1),(colorR,ColorG,ColorB,1),(colorR,ColorG,ColorB,1),(colorR,ColorG,ColorB,1),(colorR,ColorG,ColorB,1),(colorR,ColorG,ColorB,1)]; #la couleur de chaque vertex
+        self.triangle = IndexBuffer([[0,1,2],[1,2,3],[4,5,6],[5,6,7],[0,2,4],[2,4,6],[1,3,5],[7,3,5],[0,1,5],[0,4,5],[2,3,7],[2,6,7]]); # la topologie: ordre des vertex pour le dessin
+
+    def draw(self):
+        self.program.draw('triangles',self.triangle)
+
+class CubeTexture:
+    def __init__(self,longueur, largeur, profondeur, colorR, ColorG, ColorB ,program):
+        poslongueur = longueur/2;
+        poslargeur = largeur/2;
+        posprofondeur = profondeur/2;
+        forme = [(-poslongueur,poslargeur,posprofondeur),(-poslongueur,poslargeur,posprofondeur),(-poslongueur,poslargeur,posprofondeur),
+                (poslongueur,poslargeur,posprofondeur),(poslongueur,poslargeur,posprofondeur),(poslongueur,poslargeur,posprofondeur),
+                (-poslongueur,-poslargeur,posprofondeur),(-poslongueur,-poslargeur,posprofondeur),(-poslongueur,-poslargeur,posprofondeur),
+                (poslongueur,-poslargeur,posprofondeur),(poslongueur,-poslargeur,posprofondeur),(poslongueur,-poslargeur,posprofondeur),
+                (-poslongueur,poslargeur,-posprofondeur),(-poslongueur,poslargeur,-posprofondeur),(-poslongueur,poslargeur,-posprofondeur),
+                (poslongueur,poslargeur,-posprofondeur), (poslongueur,poslargeur,-posprofondeur), (poslongueur,poslargeur,-posprofondeur),
+                (-poslongueur,-poslargeur,-posprofondeur),(-poslongueur,-poslargeur,-posprofondeur),(-poslongueur,-poslargeur,-posprofondeur),
+                (poslongueur,-poslargeur,-posprofondeur),(poslongueur,-poslargeur,-posprofondeur),(poslongueur,-poslargeur,-posprofondeur)]
+        self.program = program #le program que l'on va utiliser avec ces shaders
+        self.program['position'] = forme # les vertex
+        self.program['texture'] = img1;
+        self.program['texcoord'] = [(0,0),(0,1),(1,0),(1,1),(0,0),(0,1),(1,0),(1,1),(0,0),(0,1),(1,0),(1,1),(0,0),(0,1),(1,0),(1,1),(0,0),(0,1),(1,0),(1,1),(0,0),(0,1),(1,0),(1,1)]
+
+        #                               1                          2                            3                     4                       5                       6                       7                           8                         9                       10                          11                      12                          
+        #self.program['color'] = [(colorR,ColorG,ColorB,1),(colorR,ColorG,ColorB,1),(colorR,ColorG,ColorB,1),(colorR,ColorG,ColorB,1),(colorR,ColorG,ColorB,1),(colorR,ColorG,ColorB,1),(colorR,ColorG,ColorB,1),(colorR,ColorG,ColorB,1)]; #la couleur de chaque vertex
+        self.triangle = IndexBuffer([[0,3,6],[3,6,9],[12,15,18],[15,18,21],[1,7,13],[7,13,19],[4,10,16],[22,10,16],[2,5,17],[2,14,17],[8,11,23],[8,20,23]]); # la topologie: ordre des vertex pour le dessin
+        #                               FACE 1              FACE 3               FACE 4             FACE 2              FACE 5              FACE 6
+    def draw(self):
+        self.program.draw('triangles',self.triangle)
+
 
 
 
@@ -88,11 +129,36 @@ void main()
 }
 """
 
+vertexTexture = """
+uniform mat4 model;
+uniform mat4 view;
+uniform mat4 projection;
+uniform sampler2D texture;
+attribute vec3 position;
+attribute vec2 texcoord;
+attribute vec3 normal;
+varying vec2 v_texcoord;
+void main()
+{
+gl_Position = projection * view * model * vec4(position,1.0);
+v_texcoord = texcoord;
+}
+"""
+#fragment shader---------------------------------------------------------------
+fragmentTexture = """
+uniform sampler2D texture;
+varying vec2 v_texcoord;
+void main()
+{
+gl_FragColor = texture2D(texture, v_texcoord);
+} """
+
 class Canvas(app.Canvas):
     def __init__(self):
         app.Canvas.__init__(self, size=(512, 512), title='World Frame',keys='interactive')
         # Build program & data
         self.program = Program(vertexColor, fragmentColor) #les shaders que l'on va utiliser
+        self.programTexture = Program(vertexTexture, fragmentTexture) #les shaders que l'on va utiliser
         
 
         #Commandes timer pour rotation
@@ -109,6 +175,8 @@ class Canvas(app.Canvas):
         model = np.eye(4, dtype=np.float32) #matrice identitée
         self.program['model'] = model #matrice de l'objet
         self.program['view'] = view #matrice de la camera
+        self.programTexture['model'] = model #matrice de l'objet
+        self.programTexture['view'] = view #matrice de la camera
 
         gloo.set_state(clear_color=(0.30, 0.30, 0.35, 1.00), depth_test=True) #couleur du fond et test de profondeur
         self.activate_zoom() #generation de la matrice de projection
@@ -128,8 +196,11 @@ class Canvas(app.Canvas):
         #tZ = line(0,0,0,0,0,1,0,0,1,self.program) #création d'un ligne en Z couleur bleue
         #tZ.draw()
 
-        tX = Cube_Filaire(1,1,1,1,1,1,self.program) #création d'un ligne en X couleur rouge 
+        tX = Cube_Filaire(2,2,2,0,1,1,self.program) #création d'un ligne en X couleur rouge 
         tX.draw()
+
+        t2 = CubeTexture(1,1,1,1,0,1 ,self.programTexture) #création d'un ligne en X couleur rouge 
+        t2.draw()
 
     def drawLineCube(self):
         tX = line(0,0,0,1,0,0,1,0,0,self.program) #création d'un ligne en X couleur rouge 
@@ -146,6 +217,7 @@ class Canvas(app.Canvas):
         gloo.set_viewport(0, 0, *self.physical_size)
         projection = perspective(45.0, self.size[0] / float(self.size[1]),2.0, 10.0) #matrice de projection
         self.program['projection'] = projection
+        self.programTexture['projection'] = projection
 
 
 
@@ -172,27 +244,27 @@ class Canvas(app.Canvas):
     #    tZ = line(0,0,0,0,0,1,0,0,1,self.program) #création d'un ligne en Z couleur bleue
     #    tZ.draw()
 
-    #def on_mouse_move(self,event):
-    #    self.new_method(event)
-    #    x = event.pos[0] 
-    #    y = event.pos[1] 
-    #    #print(self.size)               #use to know the size of the canva
-    #    #print (event.pos)              #use to verify position reading work well
-    #    w,h=self.size
-    #    thetaX = (360/h)*y - 180
-    #    thetaY = (360/w)*x - 180
-    #    print(w,h,thetaX,thetaY)
-    #    Rx = rotate(thetaX, (1,0,0))
-    #    Ry = rotate(thetaY, (0,1,0))
-    #    R = matmul(Rx, Ry)
-    #    #print(R)
+    def on_mouse_move(self,event):
+        x = event.pos[0] 
+        y = event.pos[1] 
+        #print(self.size)               #use to know the size of the canva
+        #print (event.pos)              #use to verify position reading work well
+        w,h=self.size
+        thetaX = (360/h)*y - 180
+        thetaY = (360/w)*x - 180
+        print(w,h,thetaX,thetaY)
+        Rx = rotate(thetaX, (1,0,0))
+        Ry = rotate(thetaY, (0,1,0))
+        R = matmul(Rx, Ry)
+        #print(R)
 
-    #    self.program['model'] = R
-    #    self.update() # on remet à jour et on redessine
+        self.program['model'] = R
+        self.programTexture['model'] = R
+        self.update() # on remet à jour et on redessine
 
        
-    #    #self.thetax = self.mathmul(-180, 180)
-    #    #self.program['model'] = rotate(self.thetax, (1, 0, 0))
+        #self.thetax = self.mathmul(-180, 180)
+        #self.program['model'] = rotate(self.thetax, (1, 0, 0))
 
 
 
