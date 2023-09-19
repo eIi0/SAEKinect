@@ -43,6 +43,28 @@ class TriangleWireFrame:
     def draw(self):
         self.program.draw('lines',self.triangle)
 
+class Cube_Filaire:
+    def __init__(self,longueur, largeur, profondeur, colorR, ColorG, ColorB ,program):
+        poslongueur = longueur/2;
+        poslargeur = largeur/2;
+        posprofondeur = profondeur/2;
+        forme = [[(poslongueur,poslargeur,posprofondeur), (poslongueur,-poslargeur,posprofondeur),(-poslongueur,-poslargeur,posprofondeur),(-poslongueur,poslargeur,posprofondeur)],
+        [(poslongueur,poslargeur,posprofondeur), (poslongueur,poslargeur,-posprofondeur),(poslongueur,-poslargeur,-posprofondeur),(poslongueur,-poslargeur,posprofondeur)],
+        [(poslongueur,poslargeur,-posprofondeur), (poslongueur,-poslargeur,-posprofondeur),(-poslongueur,-poslargeur,-posprofondeur),(-poslongueur,poslargeur,-posprofondeur)],
+        [(-poslongueur,poslargeur,posprofondeur), (-poslongueur,poslargeur,-posprofondeur),(-poslongueur,-poslargeur,-posprofondeur),(-poslongueur,-poslargeur,posprofondeur)]]
+
+       
+        self.program = program #le program que l'on va utiliser avec ces shaders
+        self.program['position'] = forme
+        self.program['color'] = [(colorR,ColorG,ColorB,1),(colorR,ColorG,ColorB,1),(colorR,ColorG,ColorB,1),(colorR,ColorG,ColorB,1)]; #la couleur de chaque vertex
+        self.carre = IndexBuffer([[0,1],[1,2],[2,3],[3,0]]); # la topologie: ordre des vertex pour le dessin
+
+        
+    def draw(self):
+        self.program.draw('lines',self.carre)
+
+
+
 #vertex shader------------------------------
 vertexColor = """
 uniform mat4 model;
@@ -99,12 +121,18 @@ class Canvas(app.Canvas):
         #t2 = TriangleWireFrame(-1.,0,0,-1.,1,0,-0.5,0.5,0,self.program) #construction d'un objet triangle
         #t2.draw() #affichage de l'objet
 
-        tX = line(0,0,0,1,0,0,1,0,0,self.program) #création d'un ligne en X couleur rouge 
+        #tX = line(0,0,0,1,0,0,1,0,0,self.program) #création d'un ligne en X couleur rouge 
+        #tX.draw()
+        #tY = line(0,0,0,0,1,0,0,1,0,self.program) #création d'un ligne en Y couleur vert
+        #tY.draw()
+        #tZ = line(0,0,0,0,0,1,0,0,1,self.program) #création d'un ligne en Z couleur bleue
+        #tZ.draw()
+
+        tX = Cube_Filaire(1,1,1,1,1,1,self.program) #création d'un ligne en X couleur rouge 
         tX.draw()
-        tY = line(0,0,0,0,1,0,0,1,0,self.program) #création d'un ligne en Y couleur vert
-        tY.draw()
-        tZ = line(0,0,0,0,0,1,0,0,1,self.program) #création d'un ligne en Z couleur bleue
-        tZ.draw()
+
+    def drawLineCube(self):
+        tX = line(0,0,0,1,0,0,1,0,0,self.program) #création d'un ligne en X couleur rouge 
 
     def on_draw(self, event):
         gloo.set_clear_color('grey')
@@ -119,33 +147,52 @@ class Canvas(app.Canvas):
         projection = perspective(45.0, self.size[0] / float(self.size[1]),2.0, 10.0) #matrice de projection
         self.program['projection'] = projection
 
+
+
     #def on_timer(self, event):
     #    self.thetax = self.thetax+1
     #    self.program['model'] = rotate(self.thetax, (1, 0, 0))
     #    self.update() # on remet à jour et on redessine
 
-    def on_mouse_move(self,event):
-        self.new_method(event)
-        x = event.pos[0] 
-        y = event.pos[1] 
-        #print(self.size)               #use to know the size of the canva
-        #print (event.pos)              #use to verify position reading work well
-        print()
-        thetaX = ((self.size[0]/2)/self.size[1])*y -self.size[0]/2
-        thetaY = ((self.size[1]/2)/self.size[0])*x -self.size[1]/2
-        Rx = rotate(thetaX, (1,0,0))
-        Ry = rotate(thetaY, (0,1,0))
-        R = matmul(Rx, Ry)
 
-        self.program['model'] = R
-        self.update() # on remet à jour et on redessine
+
+
+    #################################### - Etape 2 - 
+    #def drawFrame(self):
+    #    #t1 = Triangle(0,0,0,0,1,0,0.5,0.5,0,self.program) #construction d'un objet triangle
+    #    #t1.draw() #affichage de l'objet
+
+    #    #t2 = TriangleWireFrame(-1.,0,0,-1.,1,0,-0.5,0.5,0,self.program) #construction d'un objet triangle
+    #    #t2.draw() #affichage de l'objet
+
+    #    tX = line(0,0,0,1,0,0,1,0,0,self.program) #création d'un ligne en X couleur rouge 
+    #    tX.draw()
+    #    tY = line(0,0,0,0,1,0,0,1,0,self.program) #création d'un ligne en Y couleur vert
+    #    tY.draw()
+    #    tZ = line(0,0,0,0,0,1,0,0,1,self.program) #création d'un ligne en Z couleur bleue
+    #    tZ.draw()
+
+    #def on_mouse_move(self,event):
+    #    self.new_method(event)
+    #    x = event.pos[0] 
+    #    y = event.pos[1] 
+    #    #print(self.size)               #use to know the size of the canva
+    #    #print (event.pos)              #use to verify position reading work well
+    #    w,h=self.size
+    #    thetaX = (360/h)*y - 180
+    #    thetaY = (360/w)*x - 180
+    #    print(w,h,thetaX,thetaY)
+    #    Rx = rotate(thetaX, (1,0,0))
+    #    Ry = rotate(thetaY, (0,1,0))
+    #    R = matmul(Rx, Ry)
+    #    #print(R)
+
+    #    self.program['model'] = R
+    #    self.update() # on remet à jour et on redessine
 
        
-        #self.thetax = self.mathmul(-180, 180)
-        #self.program['model'] = rotate(self.thetax, (1, 0, 0))
-
-    def new_method(self, event):
-        x = (event.pos[0])
+    #    #self.thetax = self.mathmul(-180, 180)
+    #    #self.program['model'] = rotate(self.thetax, (1, 0, 0))
 
 
 
