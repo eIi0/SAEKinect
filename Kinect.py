@@ -127,38 +127,47 @@ class CubeTexture:
 
 
 class CylindreTexture:
-    def __init__(self,R, h, program):
-        dT = 1
+    def __init__(self,R, h,n, program):
         tabforme=[]
-        for T in range(360):
-            x1 = R*cos(T)
-            y1 = R*sin(T)
-            z1 = -h
-            x2 = R*cos(T)
-            y2 = R*sin(T)
-            z2 = h
-            x3 = R*cos(T + dT)
-            y3 = R*sin(T + dT)
-            z3 = -h
-            x4 = R*cos(T + dT)
-            y4 = R*sin(T + dT)
-            z4 = h
+        dT = 360/n
+        self.dT = dT
+        self.texture = gloo.Texture2D(img4)
+        self.n = n
+       
+        self.program = program #le program que l'on va utiliser avec ces shaders
+        for T in range(0,n,int(dT)):
+            x1 = R*cos(degrees_to_radians(T))
+            y1 = R*sin(degrees_to_radians(T))
+            z1 = -h/2
+            x2 = R*cos(degrees_to_radians(T))
+            y2 = R*sin(degrees_to_radians(T))
+            z2 = h/2
+            x3 = R*cos(degrees_to_radians(T+dT))
+            y3 = R*sin(degrees_to_radians(T+dT))
+            z3 = -h/2
+            x4 = R*cos(degrees_to_radians(T+dT))
+            y4 = R*sin(degrees_to_radians(T+dT))
+            z4 = h/2
+            tabforme.append([[x1,y1,z1],[x2,y2,z2],[x3,y3,z3],[x4,y4,z4]])
+                        
+        self.tableau = tabforme
 
-            tabforme=([[x1,y1,z1],[x2,y2,z2],[x3,y3,z3],[x4,y4,z4]])
-
-            self.program = program #le program que l'on va utiliser avec ces shaders
-            self.program['position'] = tabforme # les vertex
+    def draw(self):
+        valVertex = self.tableau
+        dT = self.dT
+        n = self.n
+        self.program['texture'] = img4;
+        for T in range(0,n,int(dT)):
+            tabdecompose = valVertex.pop(0)
+            self.program['position'] = tabdecompose # les vertex
             self.Face = IndexBuffer([[0,1,2],[1,2,3]]);
-            self.program['texcoord'] = [(0,0),(0,1),(1,0),(1,1)]
-            self.program['texture'] = img4;
+            
+            self.program['texcoord'] = [(T/n,0),(T/n,1),((T+1)/n,0),((T+1)/n,1)]
+            
             self.program.draw('triangles',self.Face)
-
-
         
-
-    #def draw(self):
-    #    self.program['texture'] = img1;
-        
+def degrees_to_radians(degrees):
+    return degrees * (pi / 180)    
 
 #vertex shader------------------------------
 vertexColor = """
@@ -256,8 +265,8 @@ class Canvas(app.Canvas):
         #t2 = CubeTexture(1,1,1,self.programTexture) #création d'un ligne en X couleur rouge 
         #t2.draw()
 
-        t3 = CylindreTexture(0.3,1,self.programTexture) #création d'un ligne en X couleur rouge 
-        #t3.draw()
+        t3 = CylindreTexture(0.8,1,360,self.programTexture) #création d'un ligne en X couleur rouge 
+        t3.draw()
 
     def drawLineCube(self):
         tX = line(0,0,0,1,0,0,1,0,0,self.program) #création d'un ligne en X couleur rouge 
@@ -309,7 +318,7 @@ class Canvas(app.Canvas):
         w,h=self.size
         thetaX = (360/h)*y - 180
         thetaY = (360/w)*x - 180
-        print(w,h,thetaX,thetaY)
+        #print(w,h,thetaX,thetaY)
         Rx = rotate(thetaX, (1,0,0))
         Ry = rotate(thetaY, (0,1,0))
         R = matmul(Rx, Ry)
