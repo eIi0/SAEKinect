@@ -185,6 +185,7 @@ class SphereTexture:
         
         self.program = program
         self.Face = IndexBuffer([[0, 1, 2], [1, 2, 3]])
+        self.program['texture'] = img4
         for i in range(n):
             T=0
             for j in range(n):
@@ -207,7 +208,7 @@ class SphereTexture:
                 c=j/n
                 d=(j+1)/n
                 self.program['position'] = [(x1, y1, z1), (x2, y2, z2), (x3, y3, z3), (x4, y4, z4)]
-                self.program['texture'] = img4
+                
                 self.program['texcoord'] = [(a, c), (b, c), (a, d), (b, d)]
                 
                 self.program.draw('triangles', self.Face)
