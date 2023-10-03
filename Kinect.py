@@ -3,21 +3,22 @@
 from operator import matmul
 from math import*
 import sys
+import math
 from turtle import window_height, window_width
 import numpy as np
-from vispy import gloo, app
+from vispy import gloo, app 
 from vispy.app import MouseEvent,KeyEvent
 from vispy.util import keys
 from vispy.gloo import Program, IndexBuffer
 from vispy.util.transforms import perspective, translate, rotate
 import matplotlib.image as mpimage
 #load textures
-img1 = mpimage.imread('Z:\BUT\SAE Kinect\loopython.png')
-img2 = mpimage.imread('Z:\BUT\SAE Kinect\girafe.jfif')
-img3 = mpimage.imread('Z:\BUT\SAE Kinect\Internet-Explorer-logo.jpg')
-img4 = mpimage.imread('Z:\BUT\SAE Kinect\kirikou.jpg')
-img5 = mpimage.imread('Z:\BUT\SAE Kinect\panda_roux.jpg')
-img6 = mpimage.imread('Z:\BUT\SAE Kinect\photo-de-cheval-qui-broute_6.jpg')
+img1 = mpimage.imread('Z:\BUT3\SAE Kinect\loopython.png')
+img2 = mpimage.imread('Z:\BUT3\SAE Kinect\girafe.jfif')
+img3 = mpimage.imread('Z:\BUT3\SAE Kinect\Internet-Explorer-logo.jpg')
+img4 = mpimage.imread('Z:\BUT3\SAE Kinect\kirikou.jpg')
+img5 = mpimage.imread('Z:\BUT3\SAE Kinect\panda_roux.jpg')
+img6 = mpimage.imread('Z:\BUT3\SAE Kinect\photo-de-cheval-qui-broute_6.jpg')
 
 
 
@@ -133,20 +134,20 @@ class CylindreTexture:
         self.dT = dT
         self.texture = gloo.Texture2D(img4)
         self.n = n
-       
+        
         self.program = program #le program que l'on va utiliser avec ces shaders
         for T in range(0,n,int(dT)):
-            x1 = R*cos(degrees_to_radians(T))
-            y1 = R*sin(degrees_to_radians(T))
+            x1 = R*cos((T))
+            y1 = R*sin((T))
             z1 = -h/2
-            x2 = R*cos(degrees_to_radians(T))
-            y2 = R*sin(degrees_to_radians(T))
+            x2 = R*cos((T))
+            y2 = R*sin((T))
             z2 = h/2
-            x3 = R*cos(degrees_to_radians(T+dT))
-            y3 = R*sin(degrees_to_radians(T+dT))
+            x3 = R*cos((T+dT))
+            y3 = R*sin((T+dT))
             z3 = -h/2
-            x4 = R*cos(degrees_to_radians(T+dT))
-            y4 = R*sin(degrees_to_radians(T+dT))
+            x4 = R*cos((T+dT))
+            y4 = R*sin((T+dT))
             z4 = h/2
             tabforme.append([[x1,y1,z1],[x2,y2,z2],[x3,y3,z3],[x4,y4,z4]])
                         
@@ -166,8 +167,77 @@ class CylindreTexture:
             
             self.program.draw('triangles',self.Face)
         
-def degrees_to_radians(degrees):
-    return degrees * (pi / 180)    
+        #def (degrees):
+        #    return degrees * (pi / 180)    
+
+
+import math
+
+class SphereTexture:
+    def __init__(self, R, n, program):
+        
+        dT = 2*np.pi/n
+        dP = np.pi/n
+        P=0
+        T=0
+        c=0
+        d=0
+        
+        self.program = program
+        self.Face = IndexBuffer([[0, 1, 2], [1, 2, 3]])
+        for i in range(n):
+            T=0
+            for j in range(n):
+                x1 = R * math.sin((P)) * math.cos((T))
+                y1 = R * math.sin((P)) * math.sin((T))
+                z1 = R * math.cos((P))
+                x2 = R * math.sin((P + dP)) * math.cos((T))
+                y2 = R * math.sin((P + dP)) * math.sin((T))
+                z2 = R * math.cos((P + dP))
+                x3 = R * math.sin((P)) * math.cos((T + dT))
+                y3 = R * math.sin((P)) * math.sin((T + dT))
+                z3 = R * math.cos((P))
+                x4 = R * math.sin((P + dP)) * math.cos((T + dT))
+                y4 = R * math.sin((P + dP)) * math.sin((T + dT))
+                z4 = R * math.cos((P + dP))
+                T=T+dT
+
+                a=i/n
+                b=(i+1)/n
+                c=j/n
+                d=(j+1)/n
+                self.program['position'] = [(x1, y1, z1), (x2, y2, z2), (x3, y3, z3), (x4, y4, z4)]
+                self.program['texture'] = img4
+                self.program['texcoord'] = [(a, c), (b, c), (a, d), (b, d)]
+                
+                self.program.draw('triangles', self.Face)
+            P=P+dP
+#def (degrees):
+#    return degrees * (math.pi / 180)
+    
+        #self.tableau = tabforme
+
+    #def draw(self):
+    #    valVertex = self.tableau
+    #    dT = self.dT
+    #    n = self.n
+        
+    #    self.Face = IndexBuffer([[0,1,2],[1,2,3]]);
+    #    #for T in range(0,int(n),int(dT)):
+    #    T=0
+    #    tabdecompose = valVertex.pop(0)
+    #    self.program['position'] = tabdecompose # les vertex
+            
+            
+    #    self.program['texcoord'] = [(T/n,0),(T/n,1),((T+1)/n,0),((T+1)/n,1)]
+            
+    #    self.program.draw('triangles',self.Face)
+        
+#def (degrees):
+#    return degrees * (pi / 180)    
+
+
+
 
 #vertex shader------------------------------
 vertexColor = """
@@ -259,14 +329,18 @@ class Canvas(app.Canvas):
         #tZ = line(0,0,0,0,0,1,0,0,1,self.program) #création d'un ligne en Z couleur bleue
         #tZ.draw()
 
-        tX = Cube_Filaire(2,2,2,0,1,1,self.program) #création d'un ligne en X couleur rouge 
-        tX.draw()
+        #tX = Cube_Filaire(2,2,2,0,1,1,self.program) #création d'un ligne en X couleur rouge 
+        #tX.draw()
 
-        #t2 = CubeTexture(1,1,1,self.programTexture) #création d'un ligne en X couleur rouge 
-        #t2.draw()
+        ##t2 = CubeTexture(1,1,1,self.programTexture) #création d'un ligne en X couleur rouge 
+        ##t2.draw()
 
-        t3 = CylindreTexture(0.8,1,360,self.programTexture) #création d'un ligne en X couleur rouge 
-        t3.draw()
+        #t3 = CylindreTexture(0.8,1,360,self.programTexture) #création d'un ligne en X couleur rouge 
+        #t3.draw()
+        t4 = SphereTexture(0.5,18,self.programTexture) #création d'un ligne en X couleur rouge 
+        #t4.draw()
+
+
 
     def drawLineCube(self):
         tX = line(0,0,0,1,0,0,1,0,0,self.program) #création d'un ligne en X couleur rouge 
