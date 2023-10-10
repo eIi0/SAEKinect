@@ -11,7 +11,14 @@ from vispy.app import MouseEvent,KeyEvent
 from vispy.util import keys
 from vispy.gloo import Program, IndexBuffer
 from vispy.util.transforms import perspective, translate, rotate
+sys.path.insert(1, 'Z:/BUT3/SAE Kinect/SAE Kinect/Kinect/pyKinectAzure-master')
+import pykinect_azure as pykinect
 import matplotlib.image as mpimage
+
+
+scale = 1000
+
+
 #load textures
 img1 = mpimage.imread('Z:\BUT3\SAE Kinect\loopython.png')
 img2 = mpimage.imread('Z:\BUT3\SAE Kinect\girafe.jfif')
@@ -19,6 +26,17 @@ img3 = mpimage.imread('Z:\BUT3\SAE Kinect\Internet-Explorer-logo.jpg')
 img4 = mpimage.imread('Z:\BUT3\SAE Kinect\kirikou.jpg')
 img5 = mpimage.imread('Z:\BUT3\SAE Kinect\panda_roux.jpg')
 img6 = mpimage.imread('Z:\BUT3\SAE Kinect\photo-de-cheval-qui-broute_6.jpg')
+
+JointTete = {"tete":26,"nez":27,"oeil gauche":28,
+             "oreille gauche":29,"oeil droit":30,"oreille droite":31}
+JointBuste = {"thorax":2,"nombril":1,"pelvis":0,"cou":3}
+JointBrasGauche = {"clavicule gauche":4,"epaule gauche":5,"coude gauche":6,"poignet gauche":7,
+                   "main gauche":8,"doigt gauche":9,"pouce gauche":10}
+JointBrasDroit = {"clavicule droit":11,"epaule droit":12,"coude droit":13,"poignet droit":14,
+                   "main droit":15,"doigt droit":16,"pouce droit":17}
+JointJambeGauche = {"hanche gauche":18,"genou gauche":19,"cheville gauche":20,"pied gauche":21}
+JointJambeDroite = {"hanche droite":22,"genou droite":23,"cheville droite":24,"pied droite":25}
+
 
 
 
@@ -291,6 +309,7 @@ class Canvas(app.Canvas):
     def __init__(self):
         app.Canvas.__init__(self, size=(512, 512), title='World Frame',keys='interactive')
         # Build program & data
+        self.numbersbody = 0
         self.program = Program(vertexColor, fragmentColor) #les shaders que l'on va utiliser
         self.programTexture = Program(vertexTexture, fragmentTexture) #les shaders que l'on va utiliser
         
@@ -302,7 +321,7 @@ class Canvas(app.Canvas):
 
         #Commandes pour suivi de la souris
         self.thetax = 0.0 #variable d'angle
-        self
+        self.thetay = 0.0 #variable d'angle
 
         # Build view, model, projection & normal
         view = translate((0, 0, -4)) #on recule la camera suivant z
@@ -315,31 +334,60 @@ class Canvas(app.Canvas):
         gloo.set_state(clear_color=(0.30, 0.30, 0.35, 1.00), depth_test=True) #couleur du fond et test de profondeur
         self.activate_zoom() #generation de la matrice de projection
         self.show() #rendu
+        self.timer=app.Timer('auto',self.on_timer)
+        self.bodyTracker=bodyTracker
+        self.device=device
+        self.timer.start()
+
+
+
+
+
 
     def drawFrame(self):
-        #t1 = Triangle(0,0,0,0,1,0,0.5,0.5,0,self.program) #construction d'un objet triangle
-        #t1.draw() #affichage de l'objet
+    #    #t1 = Triangle(0,0,0,0,1,0,0.5,0.5,0,self.program) #construction d'un objet triangle
+    #    #t1.draw() #affichage de l'objet
 
-        #t2 = TriangleWireFrame(-1.,0,0,-1.,1,0,-0.5,0.5,0,self.program) #construction d'un objet triangle
-        #t2.draw() #affichage de l'objet
+    #    #t2 = TriangleWireFrame(-1.,0,0,-1.,1,0,-0.5,0.5,0,self.program) #construction d'un objet triangle
+    #    #t2.draw() #affichage de l'objet
 
-        #tX = line(0,0,0,1,0,0,1,0,0,self.program) #création d'un ligne en X couleur rouge 
-        #tX.draw()
-        #tY = line(0,0,0,0,1,0,0,1,0,self.program) #création d'un ligne en Y couleur vert
-        #tY.draw()
-        #tZ = line(0,0,0,0,0,1,0,0,1,self.program) #création d'un ligne en Z couleur bleue
-        #tZ.draw()
+        tX = line(0,0,0,1,0,0,1,0,0,self.program) #création d'un ligne en X couleur rouge 
+        tX.draw()
+        tY = line(0,0,0,0,1,0,0,1,0,self.program) #création d'un ligne en Y couleur vert
+        tY.draw()
+        tZ = line(0,0,0,0,0,1,0,0,1,self.program) #création d'un ligne en Z couleur bleue
+        tZ.draw()
 
-        #tX = Cube_Filaire(2,2,2,0,1,1,self.program) #création d'un ligne en X couleur rouge 
-        #tX.draw()
+    #    #tX = Cube_Filaire(2,2,2,0,1,1,self.program) #création d'un ligne en X couleur rouge 
+    #    #tX.draw()
 
-        ##t2 = CubeTexture(1,1,1,self.programTexture) #création d'un ligne en X couleur rouge 
-        ##t2.draw()
+    #    ##t2 = CubeTexture(1,1,1,self.programTexture) #création d'un ligne en X couleur rouge 
+    #    ##t2.draw()
 
-        #t3 = CylindreTexture(0.8,1,360,self.programTexture) #création d'un ligne en X couleur rouge 
-        #t3.draw()
-        t4 = SphereTexture(0.5,18,self.programTexture) #création d'un ligne en X couleur rouge 
-        #t4.draw()
+    #    #t3 = CylindreTexture(0.8,1,360,self.programTexture) #création d'un ligne en X couleur rouge 
+    #    #t3.draw()
+
+    #    t4 = SphereTexture(0.5,20,self.programTexture) #création d'un ligne en X couleur rouge 
+    #    #t4.draw()
+        
+        
+
+        
+
+    def on_timer(self, event):
+        # Get capture
+        capture = self.device.update()
+        # Get body tracker frame
+        body_frame = self.bodyTracker.update()
+        self.numbersbody = body_frame.get_num_bodies()
+
+        if self.numbersbody >0:
+            body = body_frame.get_body()
+            self.joints3D = body.joints
+            print(f"joint[13] = {body.joints[13].position.x},{body.joints[13].position.y},{body.joints[13].position.z}")
+            print(f"joint[14] = {body.joints[14].position.x},{body.joints[14].position.y},{body.joints[14].position.z}")
+
+            
 
 
 
@@ -349,7 +397,42 @@ class Canvas(app.Canvas):
     def on_draw(self, event):
         gloo.set_clear_color('grey')
         gloo.clear(color=True)
-        self.drawFrame()
+       
+        if self.numbersbody > 0:
+            tfilbuste = line((self.joints3D[13].position.x)/scale,(self.joints3D[13].position.y)/scale,(self.joints3D[13].position.z)/scale,(self.joints3D[14].position.x)/scale,(self.joints3D[14].position.y)/scale,(self.joints3D[14].position.z)/scale,255,255,255,self.program)
+            tfilbuste.draw()
+            tfilbuste = line((self.joints3D[14].position.x)/scale,(self.joints3D[14].position.y)/scale,(self.joints3D[14].position.z)/scale,(self.joints3D[15].position.x)/scale,(self.joints3D[15].position.y)/scale,(self.joints3D[15].position.z)/scale,255,255,255,self.program)
+            tfilbuste.draw()
+            tfilbuste = line((self.joints3D[15].position.x)/scale,(self.joints3D[15].position.y)/scale,(self.joints3D[15].position.z)/scale,(self.joints3D[16].position.x)/scale,(self.joints3D[16].position.y)/scale,(self.joints3D[16].position.z)/scale,255,255,255,self.program)
+            tfilbuste.draw()
+            tfilbuste = line((self.joints3D[14].position.x)/scale,(self.joints3D[14].position.y)/scale,(self.joints3D[14].position.z)/scale,(self.joints3D[15].position.x)/scale,(self.joints3D[15].position.y)/scale,(self.joints3D[15].position.z)/scale,255,255,255,self.program)
+            tfilbuste.draw()
+            tfilbuste = line((self.joints3D[15].position.x)/scale,(self.joints3D[15].position.y)/scale,(self.joints3D[15].position.z)/scale,(self.joints3D[17].position.x)/scale,(self.joints3D[17].position.y)/scale,(self.joints3D[17].position.z)/scale,255,255,255,self.program)
+            tfilbuste.draw()
+            tfilbuste = line((self.joints3D[18].position.x)/scale,(self.joints3D[18].position.y)/scale,(self.joints3D[18].position.z)/scale,(self.joints3D[19].position.x)/scale,(self.joints3D[19].position.y)/scale,(self.joints3D[19].position.z)/scale,255,255,255,self.program)
+            tfilbuste.draw()
+            tfilbuste = line((self.joints3D[19].position.x)/scale,(self.joints3D[19].position.y)/scale,(self.joints3D[19].position.z)/scale,(self.joints3D[20].position.x)/scale,(self.joints3D[20].position.y)/scale,(self.joints3D[20].position.z)/scale,255,255,255,self.program)
+            tfilbuste.draw()
+            tfilbuste = line((self.joints3D[20].position.x)/scale,(self.joints3D[20].position.y)/scale,(self.joints3D[20].position.z)/scale,(self.joints3D[21].position.x)/scale,(self.joints3D[21].position.y)/scale,(self.joints3D[21].position.z)/scale,255,255,255,self.program)
+            tfilbuste.draw()
+            tfilbuste = line((self.joints3D[22].position.x)/scale,(self.joints3D[22].position.y)/scale,(self.joints3D[22].position.z)/scale,(self.joints3D[23].position.x)/scale,(self.joints3D[23].position.y)/scale,(self.joints3D[23].position.z)/scale,255,255,255,self.program)
+            tfilbuste.draw()
+            tfilbuste = line((self.joints3D[23].position.x)/scale,(self.joints3D[23].position.y)/scale,(self.joints3D[23].position.z)/scale,(self.joints3D[24].position.x)/scale,(self.joints3D[24].position.y)/scale,(self.joints3D[24].position.z)/scale,255,255,255,self.program)
+            tfilbuste.draw()
+            tfilbuste = line((self.joints3D[4].position.x)/scale,(self.joints3D[4].position.y)/scale,(self.joints3D[4].position.z)/scale,(self.joints3D[5].position.x)/scale,(self.joints3D[5].position.y)/scale,(self.joints3D[5].position.z)/scale,255,255,255,self.program)
+            tfilbuste.draw()
+            tfilbuste = line((self.joints3D[5].position.x)/scale,(self.joints3D[5].position.y)/scale,(self.joints3D[5].position.z)/scale,(self.joints3D[6].position.x)/scale,(self.joints3D[6].position.y)/scale,(self.joints3D[6].position.z)/scale,255,255,255,self.program)
+            tfilbuste.draw()
+            tfilbuste = line((self.joints3D[6].position.x)/scale,(self.joints3D[6].position.y)/scale,(self.joints3D[6].position.z)/scale,(self.joints3D[7].position.x)/scale,(self.joints3D[7].position.y)/scale,(self.joints3D[7].position.z)/scale,255,255,255,self.program)
+            tfilbuste.draw()
+            tfilbuste = line((self.joints3D[7].position.x)/scale,(self.joints3D[7].position.y)/scale,(self.joints3D[7].position.z)/scale,(self.joints3D[8].position.x)/scale,(self.joints3D[8].position.y)/scale,(self.joints3D[8].position.z)/scale,255,255,255,self.program)
+            tfilbuste.draw()
+            tfilbuste = line((self.joints3D[8].position.x)/scale,(self.joints3D[8].position.y)/scale,(self.joints3D[8].position.z)/scale,(self.joints3D[9].position.x)/scale,(self.joints3D[9].position.y)/scale,(self.joints3D[9].position.z)/scale,255,255,255,self.program)
+            tfilbuste.draw()
+            tfilbuste = line((self.joints3D[8].position.x)/scale,(self.joints3D[8].position.y)/scale,(self.joints3D[8].position.z)/scale,(self.joints3D[10].position.x)/scale,(self.joints3D[10].position.y)/scale,(self.joints3D[10].position.z)/scale,255,255,255,self.program)
+            tfilbuste.draw()
+            self.update()
+
 
     def on_resize(self, event):
         gloo.set_viewport(0, 0, *event.physical_size) #l'écran d'affichage
@@ -410,6 +493,18 @@ class Canvas(app.Canvas):
 
 
 
+
+
 if __name__ == "__main__":
+    
+    pykinect.initialize_libraries(track_body=True)
+    device_config = pykinect.default_configuration
+    device_config.color_resolution = pykinect.K4A_COLOR_RESOLUTION_OFF
+    device_config.depth_mode = pykinect.K4A_DEPTH_MODE_WFOV_2X2BINNED
+    print("start device")
+    device = pykinect.start_device(config=device_config)
+
+    bodyTracker = pykinect.start_body_tracker()
     c = Canvas() #construction d'un objet Canvas
     app.run()
+    
