@@ -29,13 +29,15 @@ img6 = mpimage.imread('Z:\BUT3\SAE Kinect\photo-de-cheval-qui-broute_6.jpg')
 
 JointTete = {"tete":26,"nez":27,"oeil gauche":28,
              "oreille gauche":29,"oeil droit":30,"oreille droite":31}
-JointBuste = {"thorax":2,"nombril":1,"pelvis":0,"cou":3}
+JointBuste = {"pelvis":0,"nombril":1,"thorax":2,"cou":3}
 JointBrasGauche = {"clavicule gauche":4,"epaule gauche":5,"coude gauche":6,"poignet gauche":7,
                    "main gauche":8,"doigt gauche":9,"pouce gauche":10}
 JointBrasDroit = {"clavicule droit":11,"epaule droit":12,"coude droit":13,"poignet droit":14,
                    "main droit":15,"doigt droit":16,"pouce droit":17}
 JointJambeGauche = {"hanche gauche":18,"genou gauche":19,"cheville gauche":20,"pied gauche":21}
 JointJambeDroite = {"hanche droite":22,"genou droite":23,"cheville droite":24,"pied droite":25}
+JointConnexionJambesBuste = {"hanche droite":22, "pelvis":0,"hanche gauche":18}
+JointConnexionEpauleBuste = {"clavicule droit":11, "thorax":2,"clavicule gauche":4}
 
 
 
@@ -312,6 +314,7 @@ class Canvas(app.Canvas):
         self.numbersbody = 0
         self.program = Program(vertexColor, fragmentColor) #les shaders que l'on va utiliser
         self.programTexture = Program(vertexTexture, fragmentTexture) #les shaders que l'on va utiliser
+        self.programTextureTete = Program(vertexTexture, fragmentTexture) #les shaders que l'on va utiliser
         
 
         #Commandes timer pour rotation
@@ -330,6 +333,8 @@ class Canvas(app.Canvas):
         self.program['view'] = view #matrice de la camera
         self.programTexture['model'] = model #matrice de l'objet
         self.programTexture['view'] = view #matrice de la camera
+        self.programTextureTete['model'] = model
+        self.programTextureTete['view'] = view
 
         gloo.set_state(clear_color=(0.30, 0.30, 0.35, 1.00), depth_test=True) #couleur du fond et test de profondeur
         self.activate_zoom() #generation de la matrice de projection
@@ -370,9 +375,11 @@ class Canvas(app.Canvas):
     #    t4 = SphereTexture(0.5,20,self.programTexture) #création d'un ligne en X couleur rouge 
     #    #t4.draw()
         
+ 
+            
+    
         
-
-        
+         
 
     def on_timer(self, event):
         # Get capture
@@ -384,54 +391,162 @@ class Canvas(app.Canvas):
         if self.numbersbody >0:
             body = body_frame.get_body()
             self.joints3D = body.joints
-            print(f"joint[13] = {body.joints[13].position.x},{body.joints[13].position.y},{body.joints[13].position.z}")
-            print(f"joint[14] = {body.joints[14].position.x},{body.joints[14].position.y},{body.joints[14].position.z}")
+            #print(f"joint[13] = {body.joints[13].position.x},{body.joints[13].position.y},{body.joints[13].position.z}")
+            #print(f"joint[14] = {body.joints[14].position.x},{body.joints[14].position.y},{body.joints[14].position.z}")
 
             
-
-
-
     def drawLineCube(self):
         tX = line(0,0,0,1,0,0,1,0,0,self.program) #création d'un ligne en X couleur rouge 
 
     def on_draw(self, event):
         gloo.set_clear_color('grey')
         gloo.clear(color=True)
-       
+
         if self.numbersbody > 0:
-            tfilbuste = line((self.joints3D[13].position.x)/scale,(self.joints3D[13].position.y)/scale,(self.joints3D[13].position.z)/scale,(self.joints3D[14].position.x)/scale,(self.joints3D[14].position.y)/scale,(self.joints3D[14].position.z)/scale,255,255,255,self.program)
-            tfilbuste.draw()
-            tfilbuste = line((self.joints3D[14].position.x)/scale,(self.joints3D[14].position.y)/scale,(self.joints3D[14].position.z)/scale,(self.joints3D[15].position.x)/scale,(self.joints3D[15].position.y)/scale,(self.joints3D[15].position.z)/scale,255,255,255,self.program)
-            tfilbuste.draw()
-            tfilbuste = line((self.joints3D[15].position.x)/scale,(self.joints3D[15].position.y)/scale,(self.joints3D[15].position.z)/scale,(self.joints3D[16].position.x)/scale,(self.joints3D[16].position.y)/scale,(self.joints3D[16].position.z)/scale,255,255,255,self.program)
-            tfilbuste.draw()
-            tfilbuste = line((self.joints3D[14].position.x)/scale,(self.joints3D[14].position.y)/scale,(self.joints3D[14].position.z)/scale,(self.joints3D[15].position.x)/scale,(self.joints3D[15].position.y)/scale,(self.joints3D[15].position.z)/scale,255,255,255,self.program)
-            tfilbuste.draw()
-            tfilbuste = line((self.joints3D[15].position.x)/scale,(self.joints3D[15].position.y)/scale,(self.joints3D[15].position.z)/scale,(self.joints3D[17].position.x)/scale,(self.joints3D[17].position.y)/scale,(self.joints3D[17].position.z)/scale,255,255,255,self.program)
-            tfilbuste.draw()
-            tfilbuste = line((self.joints3D[18].position.x)/scale,(self.joints3D[18].position.y)/scale,(self.joints3D[18].position.z)/scale,(self.joints3D[19].position.x)/scale,(self.joints3D[19].position.y)/scale,(self.joints3D[19].position.z)/scale,255,255,255,self.program)
-            tfilbuste.draw()
-            tfilbuste = line((self.joints3D[19].position.x)/scale,(self.joints3D[19].position.y)/scale,(self.joints3D[19].position.z)/scale,(self.joints3D[20].position.x)/scale,(self.joints3D[20].position.y)/scale,(self.joints3D[20].position.z)/scale,255,255,255,self.program)
-            tfilbuste.draw()
-            tfilbuste = line((self.joints3D[20].position.x)/scale,(self.joints3D[20].position.y)/scale,(self.joints3D[20].position.z)/scale,(self.joints3D[21].position.x)/scale,(self.joints3D[21].position.y)/scale,(self.joints3D[21].position.z)/scale,255,255,255,self.program)
-            tfilbuste.draw()
-            tfilbuste = line((self.joints3D[22].position.x)/scale,(self.joints3D[22].position.y)/scale,(self.joints3D[22].position.z)/scale,(self.joints3D[23].position.x)/scale,(self.joints3D[23].position.y)/scale,(self.joints3D[23].position.z)/scale,255,255,255,self.program)
-            tfilbuste.draw()
-            tfilbuste = line((self.joints3D[23].position.x)/scale,(self.joints3D[23].position.y)/scale,(self.joints3D[23].position.z)/scale,(self.joints3D[24].position.x)/scale,(self.joints3D[24].position.y)/scale,(self.joints3D[24].position.z)/scale,255,255,255,self.program)
-            tfilbuste.draw()
-            tfilbuste = line((self.joints3D[4].position.x)/scale,(self.joints3D[4].position.y)/scale,(self.joints3D[4].position.z)/scale,(self.joints3D[5].position.x)/scale,(self.joints3D[5].position.y)/scale,(self.joints3D[5].position.z)/scale,255,255,255,self.program)
-            tfilbuste.draw()
-            tfilbuste = line((self.joints3D[5].position.x)/scale,(self.joints3D[5].position.y)/scale,(self.joints3D[5].position.z)/scale,(self.joints3D[6].position.x)/scale,(self.joints3D[6].position.y)/scale,(self.joints3D[6].position.z)/scale,255,255,255,self.program)
-            tfilbuste.draw()
-            tfilbuste = line((self.joints3D[6].position.x)/scale,(self.joints3D[6].position.y)/scale,(self.joints3D[6].position.z)/scale,(self.joints3D[7].position.x)/scale,(self.joints3D[7].position.y)/scale,(self.joints3D[7].position.z)/scale,255,255,255,self.program)
-            tfilbuste.draw()
-            tfilbuste = line((self.joints3D[7].position.x)/scale,(self.joints3D[7].position.y)/scale,(self.joints3D[7].position.z)/scale,(self.joints3D[8].position.x)/scale,(self.joints3D[8].position.y)/scale,(self.joints3D[8].position.z)/scale,255,255,255,self.program)
-            tfilbuste.draw()
-            tfilbuste = line((self.joints3D[8].position.x)/scale,(self.joints3D[8].position.y)/scale,(self.joints3D[8].position.z)/scale,(self.joints3D[9].position.x)/scale,(self.joints3D[9].position.y)/scale,(self.joints3D[9].position.z)/scale,255,255,255,self.program)
-            tfilbuste.draw()
-            tfilbuste = line((self.joints3D[8].position.x)/scale,(self.joints3D[8].position.y)/scale,(self.joints3D[8].position.z)/scale,(self.joints3D[10].position.x)/scale,(self.joints3D[10].position.y)/scale,(self.joints3D[10].position.z)/scale,255,255,255,self.program)
-            tfilbuste.draw()
+
+            clesBrasGauche = list(JointBrasGauche.keys())
+            clesBrasDroit = list(JointBrasDroit.keys())
+            clesJambeGauche = list(JointJambeGauche.keys())
+            clesJambeDroite = list(JointJambeDroite.keys())
+            clesTorse = list(JointBuste.keys())
+            clesTete = list(JointTete.keys())
+            clesBusteJambes = list(JointConnexionJambesBuste.keys())
+            clesBusteEpaules = list(JointConnexionEpauleBuste.keys())
+
+            for i in range(len(clesBrasGauche) - 1):
+                cle_actuelle = clesBrasGauche[i]
+                cle_suivante = clesBrasGauche[i + 1]
+
+                valeur_actuelle = JointBrasGauche[cle_actuelle]
+                valeur_suivante = JointBrasGauche[cle_suivante]
+
+                tfilbuste = line((self.joints3D[valeur_actuelle].position.x)/scale,(self.joints3D[valeur_actuelle].position.y)/scale,(self.joints3D[valeur_actuelle].position.z)/scale,(self.joints3D[valeur_suivante].position.x)/scale,(self.joints3D[valeur_suivante].position.y)/scale,(self.joints3D[valeur_suivante].position.z)/scale,255,255,255,self.program)
+                tfilbuste.draw()
+
+            for i in range(len(clesBrasDroit) - 1):
+                cle_actuelle = clesBrasDroit[i]
+                cle_suivante = clesBrasDroit[i + 1]
+
+                valeur_actuelle = JointBrasDroit[cle_actuelle]
+                valeur_suivante = JointBrasDroit[cle_suivante]
+
+                tfilbuste = line((self.joints3D[valeur_actuelle].position.x)/scale,(self.joints3D[valeur_actuelle].position.y)/scale,(self.joints3D[valeur_actuelle].position.z)/scale,(self.joints3D[valeur_suivante].position.x)/scale,(self.joints3D[valeur_suivante].position.y)/scale,(self.joints3D[valeur_suivante].position.z)/scale,255,255,255,self.program)
+                tfilbuste.draw()
+
+            for i in range(len(clesJambeGauche) - 1):
+                cle_actuelle = clesJambeGauche[i]
+                cle_suivante = clesJambeGauche[i + 1]
+
+                valeur_actuelle = JointJambeGauche[cle_actuelle]
+                valeur_suivante = JointJambeGauche[cle_suivante]
+
+                tfilbuste = line((self.joints3D[valeur_actuelle].position.x)/scale,(self.joints3D[valeur_actuelle].position.y)/scale,(self.joints3D[valeur_actuelle].position.z)/scale,(self.joints3D[valeur_suivante].position.x)/scale,(self.joints3D[valeur_suivante].position.y)/scale,(self.joints3D[valeur_suivante].position.z)/scale,255,255,255,self.program)
+                tfilbuste.draw()
+
+            for i in range(len(clesJambeDroite) - 1):
+                cle_actuelle = clesJambeDroite[i]
+                cle_suivante = clesJambeDroite[i + 1]
+
+                valeur_actuelle = JointJambeDroite[cle_actuelle]
+                valeur_suivante = JointJambeDroite[cle_suivante]
+
+                tfilbuste = line((self.joints3D[valeur_actuelle].position.x)/scale,(self.joints3D[valeur_actuelle].position.y)/scale,(self.joints3D[valeur_actuelle].position.z)/scale,(self.joints3D[valeur_suivante].position.x)/scale,(self.joints3D[valeur_suivante].position.y)/scale,(self.joints3D[valeur_suivante].position.z)/scale,255,255,255,self.program)
+                tfilbuste.draw()
+
+            for i in range(len(clesTorse) - 1):
+                cle_actuelle = clesTorse[i]
+                cle_suivante = clesTorse[i + 1]
+
+                valeur_actuelle = JointBuste[cle_actuelle]
+                valeur_suivante = JointBuste[cle_suivante]
+
+                tfilbuste = line((self.joints3D[valeur_actuelle].position.x)/scale,(self.joints3D[valeur_actuelle].position.y)/scale,(self.joints3D[valeur_actuelle].position.z)/scale,(self.joints3D[valeur_suivante].position.x)/scale,(self.joints3D[valeur_suivante].position.y)/scale,(self.joints3D[valeur_suivante].position.z)/scale,255,255,255,self.program)
+                tfilbuste.draw()
+
+            for i in range(len(clesBusteEpaules) - 1):
+                cle_actuelle = clesBusteEpaules[i]
+                cle_suivante = clesBusteEpaules[i + 1]
+
+                valeur_actuelle = JointConnexionEpauleBuste[cle_actuelle]
+                valeur_suivante = JointConnexionEpauleBuste[cle_suivante]
+
+                tfilbuste = line((self.joints3D[valeur_actuelle].position.x)/scale,(self.joints3D[valeur_actuelle].position.y)/scale,(self.joints3D[valeur_actuelle].position.z)/scale,(self.joints3D[valeur_suivante].position.x)/scale,(self.joints3D[valeur_suivante].position.y)/scale,(self.joints3D[valeur_suivante].position.z)/scale,255,255,255,self.program)
+                tfilbuste.draw()
+
+            for i in range(len(clesBusteJambes) - 1):
+                cle_actuelle = clesBusteJambes[i]
+                cle_suivante = clesBusteJambes[i + 1]
+
+                valeur_actuelle = JointConnexionJambesBuste[cle_actuelle]
+                valeur_suivante = JointConnexionJambesBuste[cle_suivante]
+
+                tfilbuste = line((self.joints3D[valeur_actuelle].position.x)/scale,(self.joints3D[valeur_actuelle].position.y)/scale,(self.joints3D[valeur_actuelle].position.z)/scale,(self.joints3D[valeur_suivante].position.x)/scale,(self.joints3D[valeur_suivante].position.y)/scale,(self.joints3D[valeur_suivante].position.z)/scale,255,255,255,self.program)
+                tfilbuste.draw()
+
+            H = np.eye(4) #matrice homogene
+            H[3,0] = self.joints3D[JointTete['tete']].position.x/scale
+            H[3,1] = -self.joints3D[JointTete['tete']].position.y/scale
+            H[3,2] = -self.joints3D[JointTete['tete']].position.z/scale
+            self.programTextureTete['model'] = H
+
+            cubetete = CubeTexture(0.3,0.3,0.3,self.programTextureTete)
+            cubetete.draw()
             self.update()
+                #print(f"Valeur actuelle: {valeur_actuelle}, Valeur suivante: {valeur_suivante}")
+
+
+            #jointstart = JointBrasGauche[i]
+            #for i in 6:
+                #[jointstart+i]
+                #[jointstart+i+1]
+                
+
+
+        
+             
+            #tfilbuste = line((self.joints3D[0].position.x)/scale,(self.joints3D[0].position.y)/scale,(self.joints3D[0].position.z)/scale,(self.joints3D[1].position.x)/scale,(self.joints3D[1].position.y)/scale,(self.joints3D[1].position.z)/scale,255,255,255,self.program)
+            #tfilbuste.draw()
+            #tfilbuste = line((self.joints3D[1].position.x)/scale,(self.joints3D[1].position.y)/scale,(self.joints3D[1].position.z)/scale,(self.joints3D[2].position.x)/scale,(self.joints3D[2].position.y)/scale,(self.joints3D[2].position.z)/scale,255,255,255,self.program)
+            #tfilbuste.draw()
+        #    tfilbuste = line((self.joints3D[2].position.x)/scale,(self.joints3D[2].position.y)/scale,(self.joints3D[2].position.z)/scale,(self.joints3D[3].position.x)/scale,(self.joints3D[3].position.y)/scale,(self.joints3D[3].position.z)/scale,255,255,255,self.program)
+        #    tfilbuste.draw()
+        #    tfilbuste = line((self.joints3D[3].position.x)/scale,(self.joints3D[3].position.y)/scale,(self.joints3D[3].position.z)/scale,(self.joints3D[26].position.x)/scale,(self.joints3D[26].position.y)/scale,(self.joints3D[26].position.z)/scale,255,255,255,self.program)
+        #    tfilbuste.draw()
+        #    tfilbuste = line((self.joints3D[11].position.x)/scale,(self.joints3D[11].position.y)/scale,(self.joints3D[11].position.z)/scale,(self.joints3D[12].position.x)/scale,(self.joints3D[12].position.y)/scale,(self.joints3D[12].position.z)/scale,255,255,255,self.program)
+        #    tfilbuste.draw()
+        #    tfilbuste = line((self.joints3D[12].position.x)/scale,(self.joints3D[12].position.y)/scale,(self.joints3D[12].position.z)/scale,(self.joints3D[13].position.x)/scale,(self.joints3D[13].position.y)/scale,(self.joints3D[13].position.z)/scale,255,255,255,self.program)
+        #    tfilbuste.draw()
+        #    tfilbuste = line((self.joints3D[13].position.x)/scale,(self.joints3D[13].position.y)/scale,(self.joints3D[13].position.z)/scale,(self.joints3D[14].position.x)/scale,(self.joints3D[14].position.y)/scale,(self.joints3D[14].position.z)/scale,255,255,255,self.program)
+        #    tfilbuste.draw()
+        #    tfilbuste = line((self.joints3D[15].position.x)/scale,(self.joints3D[15].position.y)/scale,(self.joints3D[15].position.z)/scale,(self.joints3D[16].position.x)/scale,(self.joints3D[16].position.y)/scale,(self.joints3D[16].position.z)/scale,255,255,255,self.program)
+        #    tfilbuste.draw()
+        #    tfilbuste = line((self.joints3D[14].position.x)/scale,(self.joints3D[14].position.y)/scale,(self.joints3D[14].position.z)/scale,(self.joints3D[15].position.x)/scale,(self.joints3D[15].position.y)/scale,(self.joints3D[15].position.z)/scale,255,255,255,self.program)
+        #    tfilbuste.draw()
+        #    tfilbuste = line((self.joints3D[15].position.x)/scale,(self.joints3D[15].position.y)/scale,(self.joints3D[15].position.z)/scale,(self.joints3D[17].position.x)/scale,(self.joints3D[17].position.y)/scale,(self.joints3D[17].position.z)/scale,255,255,255,self.program)
+        #    tfilbuste.draw()
+        #    tfilbuste = line((self.joints3D[18].position.x)/scale,(self.joints3D[18].position.y)/scale,(self.joints3D[18].position.z)/scale,(self.joints3D[19].position.x)/scale,(self.joints3D[19].position.y)/scale,(self.joints3D[19].position.z)/scale,255,255,255,self.program)
+        #    tfilbuste.draw()
+        #    tfilbuste = line((self.joints3D[19].position.x)/scale,(self.joints3D[19].position.y)/scale,(self.joints3D[19].position.z)/scale,(self.joints3D[20].position.x)/scale,(self.joints3D[20].position.y)/scale,(self.joints3D[20].position.z)/scale,255,255,255,self.program)
+        #    tfilbuste.draw()
+        #    tfilbuste = line((self.joints3D[20].position.x)/scale,(self.joints3D[20].position.y)/scale,(self.joints3D[20].position.z)/scale,(self.joints3D[21].position.x)/scale,(self.joints3D[21].position.y)/scale,(self.joints3D[21].position.z)/scale,255,255,255,self.program)
+        #    tfilbuste.draw()
+        #    tfilbuste = line((self.joints3D[JointJambeDroite["hanche droite"]].position.x)/scale,(self.joints3D[22].position.y)/scale,(self.joints3D[22].position.z)/scale,(self.joints3D[23].position.x)/scale,(self.joints3D[23].position.y)/scale,(self.joints3D[23].position.z)/scale,255,255,255,self.program)
+        #    tfilbuste.draw()
+        #    tfilbuste = line((self.joints3D[JointJambeDroite["genou droite"]].position.x)/scale,(self.joints3D[23].position.y)/scale,(self.joints3D[23].position.z)/scale,(self.joints3D[24].position.x)/scale,(self.joints3D[24].position.y)/scale,(self.joints3D[24].position.z)/scale,255,255,255,self.program)
+        #    tfilbuste.draw()
+        #    tfilbuste = line((self.joints3D[4].position.x)/scale,(self.joints3D[4].position.y)/scale,(self.joints3D[4].position.z)/scale,(self.joints3D[5].position.x)/scale,(self.joints3D[5].position.y)/scale,(self.joints3D[5].position.z)/scale,255,255,255,self.program)
+        #    tfilbuste.draw()
+        #    tfilbuste = line((self.joints3D[5].position.x)/scale,(self.joints3D[5].position.y)/scale,(self.joints3D[5].position.z)/scale,(self.joints3D[6].position.x)/scale,(self.joints3D[6].position.y)/scale,(self.joints3D[6].position.z)/scale,255,255,255,self.program)
+        #    tfilbuste.draw()
+        #    tfilbuste = line((self.joints3D[6].position.x)/scale,(self.joints3D[6].position.y)/scale,(self.joints3D[6].position.z)/scale,(self.joints3D[7].position.x)/scale,(self.joints3D[7].position.y)/scale,(self.joints3D[7].position.z)/scale,255,255,255,self.program)
+        #    tfilbuste.draw()
+        #    tfilbuste = line((self.joints3D[7].position.x)/scale,(self.joints3D[7].position.y)/scale,(self.joints3D[7].position.z)/scale,(self.joints3D[8].position.x)/scale,(self.joints3D[8].position.y)/scale,(self.joints3D[8].position.z)/scale,255,255,255,self.program)
+        #    tfilbuste.draw()
+        #    tfilbuste = line((self.joints3D[8].position.x)/scale,(self.joints3D[8].position.y)/scale,(self.joints3D[8].position.z)/scale,(self.joints3D[9].position.x)/scale,(self.joints3D[9].position.y)/scale,(self.joints3D[9].position.z)/scale,255,255,255,self.program)
+        #    tfilbuste.draw()
+        #    tfilbuste = line((self.joints3D[8].position.x)/scale,(self.joints3D[8].position.y)/scale,(self.joints3D[8].position.z)/scale,(self.joints3D[10].position.x)/scale,(self.joints3D[10].position.y)/scale,(self.joints3D[10].position.z)/scale,255,255,255,self.program)
+        #    tfilbuste.draw()
+            #self.update()
 
 
     def on_resize(self, event):
@@ -442,6 +557,7 @@ class Canvas(app.Canvas):
         projection = perspective(45.0, self.size[0] / float(self.size[1]),2.0, 10.0) #matrice de projection
         self.program['projection'] = projection
         self.programTexture['projection'] = projection
+        self.programTextureTete['projection'] = projection
 
 
 
@@ -484,6 +600,7 @@ class Canvas(app.Canvas):
 
         self.program['model'] = R
         self.programTexture['model'] = R
+        self.programTextureTete['model'] = R
         self.update() # on remet à jour et on redessine
 
        
