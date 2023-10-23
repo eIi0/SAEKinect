@@ -1,5 +1,6 @@
 #-*- coding:Latin-1 -*-
 #objectif de la séance afficher des triangles pleins et fils de fer
+from logging import root
 from operator import matmul
 from math import*
 import sys
@@ -39,7 +40,13 @@ JointJambeDroite = {"hanche droite":22,"genou droite":23,"cheville droite":24,"p
 JointConnexionJambesBuste = {"hanche droite":22, "pelvis":0,"hanche gauche":18}
 JointConnexionEpauleBuste = {"clavicule droit":11, "thorax":2,"clavicule gauche":4}
 
+def normalize(v): #calcule la norme d'un vecteur numpy et le normalise
+    normalized_v = v / np.sqrt(np.sum(v**2))
+    return normalized_v
 
+def distance(x1, x2, y1, y2, z1, z2):
+    dist = sqrt(pow(x1 -x2, 2)+ pow(y1 -y2, 2) + pow(z1 -z2, 2))
+    return dist
 
 
 #dessin de primitives
@@ -315,6 +322,7 @@ class Canvas(app.Canvas):
         self.program = Program(vertexColor, fragmentColor) #les shaders que l'on va utiliser
         self.programTexture = Program(vertexTexture, fragmentTexture) #les shaders que l'on va utiliser
         self.programTextureTete = Program(vertexTexture, fragmentTexture) #les shaders que l'on va utiliser
+        self.programColorBody = Program(vertexColor, fragmentColor) #les shaders que l'on va utiliser
         
 
         #Commandes timer pour rotation
@@ -335,6 +343,8 @@ class Canvas(app.Canvas):
         self.programTexture['view'] = view #matrice de la camera
         self.programTextureTete['model'] = model
         self.programTextureTete['view'] = view
+        self.programColorBody['model'] = model
+        self.programColorBody['view'] = view
 
         gloo.set_state(clear_color=(0.30, 0.30, 0.35, 1.00), depth_test=True) #couleur du fond et test de profondeur
         self.activate_zoom() #generation de la matrice de projection
@@ -376,7 +386,16 @@ class Canvas(app.Canvas):
     #    #t4.draw()
         
  
-            
+    def lookAt(directionx,directiony,directionz):
+        direction = np.array([directionx,directiony,directionz]) #conversion en numpy array
+        x = normalize(direction) #on choisit un axe, ici x
+        y = np.array([0.0,1.0,0.0])#conversion en numpy array
+        z = np.cross(x,y) #produit vectoriel
+        z = normalize(z) #on est obligé de normaliser ici
+        y = np.cross(z,x) #on trouve y
+        Matrix = np.transpose(np.array([x,y,z])) #en OpenGl c'est la transposée
+        print(f'{Matrix}')
+        return Matrix        
     
         
          
@@ -404,6 +423,9 @@ class Canvas(app.Canvas):
 
         if self.numbersbody > 0:
 
+           
+
+
             clesBrasGauche = list(JointBrasGauche.keys())
             clesBrasDroit = list(JointBrasDroit.keys())
             clesJambeGauche = list(JointJambeGauche.keys())
@@ -420,7 +442,7 @@ class Canvas(app.Canvas):
                 valeur_actuelle = JointBrasGauche[cle_actuelle]
                 valeur_suivante = JointBrasGauche[cle_suivante]
 
-                tfilbuste = line((self.joints3D[valeur_actuelle].position.x)/scale,(self.joints3D[valeur_actuelle].position.y)/scale,(self.joints3D[valeur_actuelle].position.z)/scale,(self.joints3D[valeur_suivante].position.x)/scale,(self.joints3D[valeur_suivante].position.y)/scale,(self.joints3D[valeur_suivante].position.z)/scale,255,255,255,self.program)
+                tfilbuste = line(-(self.joints3D[valeur_actuelle].position.x)/scale,-(self.joints3D[valeur_actuelle].position.y)/scale,(self.joints3D[valeur_actuelle].position.z)/scale,-(self.joints3D[valeur_suivante].position.x)/scale,-(self.joints3D[valeur_suivante].position.y)/scale,(self.joints3D[valeur_suivante].position.z)/scale,255,255,255,self.programColorBody)
                 tfilbuste.draw()
 
             for i in range(len(clesBrasDroit) - 1):
@@ -430,7 +452,7 @@ class Canvas(app.Canvas):
                 valeur_actuelle = JointBrasDroit[cle_actuelle]
                 valeur_suivante = JointBrasDroit[cle_suivante]
 
-                tfilbuste = line((self.joints3D[valeur_actuelle].position.x)/scale,(self.joints3D[valeur_actuelle].position.y)/scale,(self.joints3D[valeur_actuelle].position.z)/scale,(self.joints3D[valeur_suivante].position.x)/scale,(self.joints3D[valeur_suivante].position.y)/scale,(self.joints3D[valeur_suivante].position.z)/scale,255,255,255,self.program)
+                tfilbuste = line(-(self.joints3D[valeur_actuelle].position.x)/scale,-(self.joints3D[valeur_actuelle].position.y)/scale,(self.joints3D[valeur_actuelle].position.z)/scale,-(self.joints3D[valeur_suivante].position.x)/scale,-(self.joints3D[valeur_suivante].position.y)/scale,(self.joints3D[valeur_suivante].position.z)/scale,255,255,255,self.programColorBody)
                 tfilbuste.draw()
 
             for i in range(len(clesJambeGauche) - 1):
@@ -440,7 +462,7 @@ class Canvas(app.Canvas):
                 valeur_actuelle = JointJambeGauche[cle_actuelle]
                 valeur_suivante = JointJambeGauche[cle_suivante]
 
-                tfilbuste = line((self.joints3D[valeur_actuelle].position.x)/scale,(self.joints3D[valeur_actuelle].position.y)/scale,(self.joints3D[valeur_actuelle].position.z)/scale,(self.joints3D[valeur_suivante].position.x)/scale,(self.joints3D[valeur_suivante].position.y)/scale,(self.joints3D[valeur_suivante].position.z)/scale,255,255,255,self.program)
+                tfilbuste = line(-(self.joints3D[valeur_actuelle].position.x)/scale,-(self.joints3D[valeur_actuelle].position.y)/scale,(self.joints3D[valeur_actuelle].position.z)/scale,-(self.joints3D[valeur_suivante].position.x)/scale,-(self.joints3D[valeur_suivante].position.y)/scale,(self.joints3D[valeur_suivante].position.z)/scale,255,255,255,self.programColorBody)
                 tfilbuste.draw()
 
             for i in range(len(clesJambeDroite) - 1):
@@ -450,7 +472,7 @@ class Canvas(app.Canvas):
                 valeur_actuelle = JointJambeDroite[cle_actuelle]
                 valeur_suivante = JointJambeDroite[cle_suivante]
 
-                tfilbuste = line((self.joints3D[valeur_actuelle].position.x)/scale,(self.joints3D[valeur_actuelle].position.y)/scale,(self.joints3D[valeur_actuelle].position.z)/scale,(self.joints3D[valeur_suivante].position.x)/scale,(self.joints3D[valeur_suivante].position.y)/scale,(self.joints3D[valeur_suivante].position.z)/scale,255,255,255,self.program)
+                tfilbuste = line(-(self.joints3D[valeur_actuelle].position.x)/scale,-(self.joints3D[valeur_actuelle].position.y)/scale,(self.joints3D[valeur_actuelle].position.z)/scale,-(self.joints3D[valeur_suivante].position.x)/scale,-(self.joints3D[valeur_suivante].position.y)/scale,(self.joints3D[valeur_suivante].position.z)/scale,255,255,255,self.programColorBody)
                 tfilbuste.draw()
 
             for i in range(len(clesTorse) - 1):
@@ -460,7 +482,7 @@ class Canvas(app.Canvas):
                 valeur_actuelle = JointBuste[cle_actuelle]
                 valeur_suivante = JointBuste[cle_suivante]
 
-                tfilbuste = line((self.joints3D[valeur_actuelle].position.x)/scale,(self.joints3D[valeur_actuelle].position.y)/scale,(self.joints3D[valeur_actuelle].position.z)/scale,(self.joints3D[valeur_suivante].position.x)/scale,(self.joints3D[valeur_suivante].position.y)/scale,(self.joints3D[valeur_suivante].position.z)/scale,255,255,255,self.program)
+                tfilbuste = line(-(self.joints3D[valeur_actuelle].position.x)/scale,-(self.joints3D[valeur_actuelle].position.y)/scale,(self.joints3D[valeur_actuelle].position.z)/scale,-(self.joints3D[valeur_suivante].position.x)/scale,-(self.joints3D[valeur_suivante].position.y)/scale,(self.joints3D[valeur_suivante].position.z)/scale,255,255,255,self.programColorBody)
                 tfilbuste.draw()
 
             for i in range(len(clesBusteEpaules) - 1):
@@ -470,7 +492,7 @@ class Canvas(app.Canvas):
                 valeur_actuelle = JointConnexionEpauleBuste[cle_actuelle]
                 valeur_suivante = JointConnexionEpauleBuste[cle_suivante]
 
-                tfilbuste = line((self.joints3D[valeur_actuelle].position.x)/scale,(self.joints3D[valeur_actuelle].position.y)/scale,(self.joints3D[valeur_actuelle].position.z)/scale,(self.joints3D[valeur_suivante].position.x)/scale,(self.joints3D[valeur_suivante].position.y)/scale,(self.joints3D[valeur_suivante].position.z)/scale,255,255,255,self.program)
+                tfilbuste = line(-(self.joints3D[valeur_actuelle].position.x)/scale,-(self.joints3D[valeur_actuelle].position.y)/scale,(self.joints3D[valeur_actuelle].position.z)/scale,-(self.joints3D[valeur_suivante].position.x)/scale,-(self.joints3D[valeur_suivante].position.y)/scale,(self.joints3D[valeur_suivante].position.z)/scale,255,255,255,self.programColorBody)
                 tfilbuste.draw()
 
             for i in range(len(clesBusteJambes) - 1):
@@ -480,18 +502,48 @@ class Canvas(app.Canvas):
                 valeur_actuelle = JointConnexionJambesBuste[cle_actuelle]
                 valeur_suivante = JointConnexionJambesBuste[cle_suivante]
 
-                tfilbuste = line((self.joints3D[valeur_actuelle].position.x)/scale,(self.joints3D[valeur_actuelle].position.y)/scale,(self.joints3D[valeur_actuelle].position.z)/scale,(self.joints3D[valeur_suivante].position.x)/scale,(self.joints3D[valeur_suivante].position.y)/scale,(self.joints3D[valeur_suivante].position.z)/scale,255,255,255,self.program)
+                tfilbuste = line(-(self.joints3D[valeur_actuelle].position.x)/scale,-(self.joints3D[valeur_actuelle].position.y)/scale,(self.joints3D[valeur_actuelle].position.z)/scale,-(self.joints3D[valeur_suivante].position.x)/scale,-(self.joints3D[valeur_suivante].position.y)/scale,(self.joints3D[valeur_suivante].position.z)/scale,255,255,255,self.programColorBody)
                 tfilbuste.draw()
 
             H = np.eye(4) #matrice homogene
-            H[3,0] = self.joints3D[JointTete['tete']].position.x/scale
+            H[3,0] = -self.joints3D[JointTete['tete']].position.x/scale
             H[3,1] = -self.joints3D[JointTete['tete']].position.y/scale
-            H[3,2] = -self.joints3D[JointTete['tete']].position.z/scale
+            H[3,2] = self.joints3D[JointTete['tete']].position.z/scale
             self.programTextureTete['model'] = H
 
+            
             cubetete = CubeTexture(0.3,0.3,0.3,self.programTextureTete)
             cubetete.draw()
+           
+
+            #H = np.eye(4) #matrice homogene
+            #H[0:3,0:3] = self.lookAt(direction[0],direction[1],direction[2])
+            #H[0,3] = point1[0]
+            #H[1,3] = point1[1]
+            #H[2,3] = point1[2]
+            ##calcul du repère à dessiner
+            #Point0 = H.dot(np.array([0,0,0,1]))
+            #PointX = H.dot(np.array([0.1,0,0,1]))
+            #PointY = H.dot(np.array([0,0.1,0,1]))
+            #PointZ = H.dot(np.array([0,0,0.1,1]))
+
+            #d = distance(point1[0],point1[1],point1[2],point2[0],point2[1],point2[2])/2
+            #direction = point2-point1
+            #H = np.eye(4) #matrice homogene
+            ##on estime la matrice de rotation
+            #H[0:3,0:3] = self.lookAt(direction[0],direction[1],direction[2])
+            #H = np.transpose(H) #pour opengl
+            ##on ajoute les translation
+            #H[3,0] = -self.joints3D[joint1].position.x/scale
+            #H[3,1] = -self.joints3D[joint1].position.y/scale
+            #H[3,2] = self.joints3D[joint1].position.z/scale
+            ##decalge de la 1/2 longueur de la aprtie du coprs
+            #T = np.eye(4);
+            #T[3,0]= d #decalge suivant x
+            #H = np.matmul(T,H) #attention à l'ordre de multiplication
+
             self.update()
+
                 #print(f"Valeur actuelle: {valeur_actuelle}, Valeur suivante: {valeur_suivante}")
 
 
@@ -504,10 +556,10 @@ class Canvas(app.Canvas):
 
         
              
-            #tfilbuste = line((self.joints3D[0].position.x)/scale,(self.joints3D[0].position.y)/scale,(self.joints3D[0].position.z)/scale,(self.joints3D[1].position.x)/scale,(self.joints3D[1].position.y)/scale,(self.joints3D[1].position.z)/scale,255,255,255,self.program)
-            #tfilbuste.draw()
-            #tfilbuste = line((self.joints3D[1].position.x)/scale,(self.joints3D[1].position.y)/scale,(self.joints3D[1].position.z)/scale,(self.joints3D[2].position.x)/scale,(self.joints3D[2].position.y)/scale,(self.joints3D[2].position.z)/scale,255,255,255,self.program)
-            #tfilbuste.draw()
+        #    tfilbuste = line((self.joints3D[0].position.x)/scale,(self.joints3D[0].position.y)/scale,(self.joints3D[0].position.z)/scale,(self.joints3D[1].position.x)/scale,(self.joints3D[1].position.y)/scale,(self.joints3D[1].position.z)/scale,255,255,255,self.program)
+        #    tfilbuste.draw()
+        #    tfilbuste = line((self.joints3D[1].position.x)/scale,(self.joints3D[1].position.y)/scale,(self.joints3D[1].position.z)/scale,(self.joints3D[2].position.x)/scale,(self.joints3D[2].position.y)/scale,(self.joints3D[2].position.z)/scale,255,255,255,self.program)
+        #    tfilbuste.draw()
         #    tfilbuste = line((self.joints3D[2].position.x)/scale,(self.joints3D[2].position.y)/scale,(self.joints3D[2].position.z)/scale,(self.joints3D[3].position.x)/scale,(self.joints3D[3].position.y)/scale,(self.joints3D[3].position.z)/scale,255,255,255,self.program)
         #    tfilbuste.draw()
         #    tfilbuste = line((self.joints3D[3].position.x)/scale,(self.joints3D[3].position.y)/scale,(self.joints3D[3].position.z)/scale,(self.joints3D[26].position.x)/scale,(self.joints3D[26].position.y)/scale,(self.joints3D[26].position.z)/scale,255,255,255,self.program)
@@ -558,6 +610,7 @@ class Canvas(app.Canvas):
         self.program['projection'] = projection
         self.programTexture['projection'] = projection
         self.programTextureTete['projection'] = projection
+        self.programColorBody['projection'] = projection
 
 
 
@@ -598,9 +651,10 @@ class Canvas(app.Canvas):
         R = matmul(Rx, Ry)
         #print(R)
 
-        self.program['model'] = R
-        self.programTexture['model'] = R
-        self.programTextureTete['model'] = R
+        #self.program['model'] = R
+        #self.programTexture['model'] = R
+        #self.programTextureTete['model'] = R
+        #self.programColorBody['model'] = R
         self.update() # on remet à jour et on redessine
 
        
