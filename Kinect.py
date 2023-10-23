@@ -45,8 +45,20 @@ def normalize(v): #calcule la norme d'un vecteur numpy et le normalise
     return normalized_v
 
 def distance(x1, x2, y1, y2, z1, z2):
-    dist = sqrt(pow(x1 -x2, 2)+ pow(y1 -y2, 2) + pow(z1 -z2, 2))
+    dist = math.sqrt(math.pow(x1 -x2, 2)+ math.pow(y1 -y2, 2) + math.pow(z1 -z2, 2))
     return dist
+
+def lookAt(directionx,directiony,directionz):
+    direction = np.array([directionx,directiony,directionz]) #conversion en numpy array
+    x = normalize(direction) #on choisit un axe, ici x
+    y = np.array([0.0,1.0,0.0])#conversion en numpy array
+    z = np.cross(x,y) #produit vectoriel
+    z = normalize(z) #on est obligé de normaliser ici
+    y = np.cross(z,x) #on trouve y
+    Matrix = np.transpose(np.array([x,y,z])) #en OpenGl c'est la transposée
+    print(f'{Matrix}')
+    return Matrix        
+    
 
 
 #dessin de primitives
@@ -240,6 +252,7 @@ class SphereTexture:
                 
                 self.program.draw('triangles', self.Face)
             P=P+dP
+
 #def (degrees):
 #    return degrees * (math.pi / 180)
     
@@ -386,17 +399,7 @@ class Canvas(app.Canvas):
     #    #t4.draw()
         
  
-    def lookAt(directionx,directiony,directionz):
-        direction = np.array([directionx,directiony,directionz]) #conversion en numpy array
-        x = normalize(direction) #on choisit un axe, ici x
-        y = np.array([0.0,1.0,0.0])#conversion en numpy array
-        z = np.cross(x,y) #produit vectoriel
-        z = normalize(z) #on est obligé de normaliser ici
-        y = np.cross(z,x) #on trouve y
-        Matrix = np.transpose(np.array([x,y,z])) #en OpenGl c'est la transposée
-        print(f'{Matrix}')
-        return Matrix        
-    
+
         
          
 
@@ -511,38 +514,57 @@ class Canvas(app.Canvas):
             H[3,2] = self.joints3D[JointTete['tete']].position.z/scale
             self.programTextureTete['model'] = H
 
-            
             cubetete = CubeTexture(0.3,0.3,0.3,self.programTextureTete)
             cubetete.draw()
-           
 
-            #H = np.eye(4) #matrice homogene
-            #H[0:3,0:3] = self.lookAt(direction[0],direction[1],direction[2])
-            #H[0,3] = point1[0]
-            #H[1,3] = point1[1]
-            #H[2,3] = point1[2]
-            ##calcul du repère à dessiner
-            #Point0 = H.dot(np.array([0,0,0,1]))
-            #PointX = H.dot(np.array([0.1,0,0,1]))
-            #PointY = H.dot(np.array([0,0.1,0,1]))
-            #PointZ = H.dot(np.array([0,0,0.1,1]))
 
-            #d = distance(point1[0],point1[1],point1[2],point2[0],point2[1],point2[2])/2
-            #direction = point2-point1
-            #H = np.eye(4) #matrice homogene
-            ##on estime la matrice de rotation
-            #H[0:3,0:3] = self.lookAt(direction[0],direction[1],direction[2])
-            #H = np.transpose(H) #pour opengl
-            ##on ajoute les translation
-            #H[3,0] = -self.joints3D[joint1].position.x/scale
-            #H[3,1] = -self.joints3D[joint1].position.y/scale
-            #H[3,2] = self.joints3D[joint1].position.z/scale
-            ##decalge de la 1/2 longueur de la aprtie du coprs
-            #T = np.eye(4);
-            #T[3,0]= d #decalge suivant x
-            #H = np.matmul(T,H) #attention à l'ordre de multiplication
+
+            point1= np.array([self.joints3D[JointBrasDroit['epaule droit']].position.x/scale, self.joints3D[JointBrasDroit['epaule droit']].position.y/scale, self.joints3D[JointBrasDroit['epaule droit']].position.z/scale])
+            point2= np.array([self.joints3D[JointBrasDroit['coude droit']].position.x/scale, self.joints3D[JointBrasDroit['coude droit']].position.y/scale, self.joints3D[JointBrasDroit['coude droit']].position.z/scale])
+ 
+            #print(point1)
+            #print(point2)
+
+            d = distance(point1[0],point1[1],point1[2],point2[0],point2[1],point2[2])/2
+
+            direction = np.array([self.joints3D[JointBrasDroit['epaule droit']].position.x/scale - self.joints3D[JointBrasDroit['coude droit']].position.x/scale , 
+                                  self.joints3D[JointBrasDroit['epaule droit']].position.y/scale - self.joints3D[JointBrasDroit['coude droit']].position.y/scale , 
+                                  self.joints3D[JointBrasDroit['epaule droit']].position.z/scale - self.joints3D[JointBrasDroit['coude droit']].position.z/scale])
+            ##for i in len(point1):
+            ##       direction[i] = point2[i]-point1[i]
+            #print(direction)
+
+            #directionX = self.joints3D[JointBrasDroit['coude droit']].position.x/scale - self.joints3D[JointBrasDroit['epaule droit']].position.x/scale
+            #directionY = self.joints3D[JointBrasDroit['coude droit']].position.y/scale - self.joints3D[JointBrasDroit['epaule droit']].position.y/scale
+            #directionZ = self.joints3D[JointBrasDroit['coude droit']].position.z/scale - self.joints3D[JointBrasDroit['epaule droit']].position.z/scale
+            #direction = np.array([directionX, directionY, directionZ])
+            #print(direction)
+            #print(0)
+
+            ##direction = point2-point1
+            H = np.eye(4) #matrice homogene
+            #on estime la matrice de rotation
+            H[0:3,0:3] = lookAt(direction[0],direction[1],direction[2])
+            H = np.transpose(H) #pour opengl
+            #on ajoute les translation
+            H[3,0] = self.joints3D[JointBrasDroit['epaule droit']].position.y/scale
+            H[3,1] = self.joints3D[JointBrasDroit['epaule droit']].position.z/scale
+            H[3,2] = self.joints3D[JointBrasDroit['epaule droit']].position.x/scale
+            #decalge de la 1/2 longueur de la aprtie du coprs
+            T = np.eye(4);
+            T[3,0]= d #decalage suivant x
+            H = np.matmul(T,H) #attention à l'ordre de multiplication
+
+            self.programTexture['model'] = H
+            t3 = CylindreTexture(0.05,d,360,self.programTexture) #création d'un ligne en X couleur rouge 
+            t3.draw()
+
+            
 
             self.update()
+
+
+            
 
                 #print(f"Valeur actuelle: {valeur_actuelle}, Valeur suivante: {valeur_suivante}")
 
@@ -678,4 +700,3 @@ if __name__ == "__main__":
     bodyTracker = pykinect.start_body_tracker()
     c = Canvas() #construction d'un objet Canvas
     app.run()
-    
