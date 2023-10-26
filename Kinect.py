@@ -102,7 +102,6 @@ class Cube_Filaire:
         (-poslongueur,poslargeur,-posprofondeur), (poslongueur,poslargeur,-posprofondeur),(-poslongueur,-poslargeur,-posprofondeur),(poslongueur,-poslargeur,-posprofondeur)]
         self.program = program #le program que l'on va utiliser avec ces shaders
         self.program['position'] = forme
-        self.program['color'] = [(colorR,ColorG,ColorB,1),(colorR,ColorG,ColorB,1),(colorR,ColorG,ColorB,1),(colorR,ColorG,ColorB,1),(colorR,ColorG,ColorB,1),(colorR,ColorG,ColorB,1),(colorR,ColorG,ColorB,1),(colorR,ColorG,ColorB,1)]; #la couleur de chaque vertex
         self.carre = IndexBuffer([[0,1],[0,2],[0,4],[5,4],[5,1], [5,7], [3,2] ,[3,7],[3,1],[6,7],[6,2], [6,4]]); # la topologie: ordre des vertex pour le dessin
 
     def draw(self):
@@ -150,7 +149,7 @@ class CubeTexture:
         self.Face4 = IndexBuffer([[1,7,13],[7,13,19]]);
         self.Face5 = IndexBuffer([[2,5,17],[2,14,17]]);
         self.Face6 = IndexBuffer([[8,11,23],[8,20,23]]);
-
+        1
     def draw(self):
         self.program['texture'] = img1;
         self.program.draw('triangles',self.Face1)
@@ -252,6 +251,28 @@ class SphereTexture:
                 
                 self.program.draw('triangles', self.Face)
             P=P+dP
+
+    def dessiner_cylindre_entre_points(point1, point2, programTexture):
+       
+            direction = point2 - point1
+            d = np.linalg.norm(direction) / 2
+
+            H = np.eye(4)
+            # Vous devrez peut-être adapter cette partie en fonction de la fonction lookAt
+            H[0:3, 0:3] = lookAt(direction[0], direction[1], direction[2])
+            H = np.transpose(H)
+
+            H[3, 0] = point1[2]
+            H[3, 1] = -point1[1]
+            H[3, 2] = point1[0]
+
+            T = np.eye(4)
+            T[3, 0] = d
+            H = np.matmul(T, H)
+
+            programTexture['model'] = H
+            t3 = CylindreTexture(0.05, d, 360, programTexture)
+            t3.draw()
 
 #def (degrees):
 #    return degrees * (math.pi / 180)
@@ -400,6 +421,9 @@ class Canvas(app.Canvas):
         
  
 
+
+               
+
         
          
 
@@ -510,14 +534,46 @@ class Canvas(app.Canvas):
                     tfilbuste = line(-(self.joints3D[valeur_actuelle].position.x)/scale,-(self.joints3D[valeur_actuelle].position.y)/scale,(self.joints3D[valeur_actuelle].position.z)/scale,-(self.joints3D[valeur_suivante].position.x)/scale,-(self.joints3D[valeur_suivante].position.y)/scale,(self.joints3D[valeur_suivante].position.z)/scale,255,255,255,self.programColorBody)
                     tfilbuste.draw()
 
-                H = np.eye(4) #matrice homogene
-                H[3,0] = -self.joints3D[JointTete['tete']].position.x/scale
-                H[3,1] = -self.joints3D[JointTete['tete']].position.y/scale
-                H[3,2] = self.joints3D[JointTete['tete']].position.z/scale
-                self.programTextureTete['model'] = H
+            # 1. Obtenir le vecteur d'orientation de la tête
+            vec_orientation = np.array([self.joints3D[JointTete['tete']].position.x - self.joints3D[JointBuste['cou']].position.x,
+                                        self.joints3D[JointTete['tete']].position.y - self.joints3D[JointBuste['cou']].position.y,
+                                        self.joints3D[JointTete['tete']].position.z - self.joints3D[JointBuste['cou']].position.z])
 
-                cubetete = CubeTexture(0.3,0.3,0.3,self.programTextureTete)
-                cubetete.draw()
+            # 2. Calculer la matrice de rotation
+            rotation_matrix = lookAt(vec_orientation[0], vec_orientation[1], vec_orientation[2])
+            ## 3. Appliquer la matrice de rotation à la tête texturée
+            H_tete = np.eye(4)
+            H_tete[0:3, 0:3] = rotation_matrix
+            H_tete = np.transpose(H_tete)
+            H_tete[3,0] = -self.joints3D[JointTete['tete']].position.x/scale
+            H_tete[3,1] = -self.joints3D[JointTete['tete']].position.y/scale
+            H_tete[3,2] = self.joints3D[JointTete['tete']].position.z/scale
+
+            self.programTextureTete['model'] = H_tete
+            cubetete = CubeTexture(0.3,0.3,0.3,self.programTextureTete)
+            cubetete.draw()
+            point_epaule = np.array([
+                    self.joints3D[JointBrasDroit['epaule droit']].position.x/scale,
+                    self.joints3D[JointBrasDroit['epaule droit']].position.y/scale,
+                    self.joints3D[JointBrasDroit['epaule droit']].position.z/scale
+                ])
+            point_coude = np.array([
+                    self.joints3D[JointBrasDroit['coude droit']].position.x/scale,
+                    self.joints3D[JointBrasDroit['coude droit']].position.y/scale,
+                    self.joints3D[JointBrasDroit['coude droit']].position.z/scale
+                ])
+
+
+
+            dessiner_cylindre_entre_points(point_epaule, point_coude, self.programTexture)
+            
+
+            self.update()
+
+
+            
+
+
 
 
 
@@ -563,7 +619,7 @@ class Canvas(app.Canvas):
 
             
 
-            self.update()
+
 
 
             
