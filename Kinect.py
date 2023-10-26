@@ -425,139 +425,141 @@ class Canvas(app.Canvas):
         gloo.clear(color=True)
 
         if self.numbersbody > 0:
+            for i in range(self.numbersbody):
 
-           
+                body_frame = self.bodyTracker.update()
+                body = body_frame.get_body(i)
+                self.joints3D = body.joints
+
+                clesBrasGauche = list(JointBrasGauche.keys())
+                clesBrasDroit = list(JointBrasDroit.keys())
+                clesJambeGauche = list(JointJambeGauche.keys())
+                clesJambeDroite = list(JointJambeDroite.keys())
+                clesTorse = list(JointBuste.keys())
+                clesTete = list(JointTete.keys())
+                clesBusteJambes = list(JointConnexionJambesBuste.keys())
+                clesBusteEpaules = list(JointConnexionEpauleBuste.keys())
+
+                for i in range(len(clesBrasGauche) - 1):
+                    cle_actuelle = clesBrasGauche[i]
+                    cle_suivante = clesBrasGauche[i + 1]
+
+                    valeur_actuelle = JointBrasGauche[cle_actuelle]
+                    valeur_suivante = JointBrasGauche[cle_suivante]
+
+                    tfilbuste = line(-(self.joints3D[valeur_actuelle].position.x)/scale,-(self.joints3D[valeur_actuelle].position.y)/scale,(self.joints3D[valeur_actuelle].position.z)/scale,-(self.joints3D[valeur_suivante].position.x)/scale,-(self.joints3D[valeur_suivante].position.y)/scale,(self.joints3D[valeur_suivante].position.z)/scale,255,255,255,self.programColorBody)
+                    tfilbuste.draw()
+
+                for i in range(len(clesBrasDroit) - 1):
+                    cle_actuelle = clesBrasDroit[i]
+                    cle_suivante = clesBrasDroit[i + 1]
+
+                    valeur_actuelle = JointBrasDroit[cle_actuelle]
+                    valeur_suivante = JointBrasDroit[cle_suivante]
+
+                    tfilbuste = line(-(self.joints3D[valeur_actuelle].position.x)/scale,-(self.joints3D[valeur_actuelle].position.y)/scale,(self.joints3D[valeur_actuelle].position.z)/scale,-(self.joints3D[valeur_suivante].position.x)/scale,-(self.joints3D[valeur_suivante].position.y)/scale,(self.joints3D[valeur_suivante].position.z)/scale,255,255,255,self.programColorBody)
+                    tfilbuste.draw()
+
+                for i in range(len(clesJambeGauche) - 1):
+                    cle_actuelle = clesJambeGauche[i]
+                    cle_suivante = clesJambeGauche[i + 1]
+
+                    valeur_actuelle = JointJambeGauche[cle_actuelle]
+                    valeur_suivante = JointJambeGauche[cle_suivante]
+
+                    tfilbuste = line(-(self.joints3D[valeur_actuelle].position.x)/scale,-(self.joints3D[valeur_actuelle].position.y)/scale,(self.joints3D[valeur_actuelle].position.z)/scale,-(self.joints3D[valeur_suivante].position.x)/scale,-(self.joints3D[valeur_suivante].position.y)/scale,(self.joints3D[valeur_suivante].position.z)/scale,255,255,255,self.programColorBody)
+                    tfilbuste.draw()
+
+                for i in range(len(clesJambeDroite) - 1):
+                    cle_actuelle = clesJambeDroite[i]
+                    cle_suivante = clesJambeDroite[i + 1]
+
+                    valeur_actuelle = JointJambeDroite[cle_actuelle]
+                    valeur_suivante = JointJambeDroite[cle_suivante]
+
+                    tfilbuste = line(-(self.joints3D[valeur_actuelle].position.x)/scale,-(self.joints3D[valeur_actuelle].position.y)/scale,(self.joints3D[valeur_actuelle].position.z)/scale,-(self.joints3D[valeur_suivante].position.x)/scale,-(self.joints3D[valeur_suivante].position.y)/scale,(self.joints3D[valeur_suivante].position.z)/scale,255,255,255,self.programColorBody)
+                    tfilbuste.draw()
+
+                for i in range(len(clesTorse) - 1):
+                    cle_actuelle = clesTorse[i]
+                    cle_suivante = clesTorse[i + 1]
+
+                    valeur_actuelle = JointBuste[cle_actuelle]
+                    valeur_suivante = JointBuste[cle_suivante]
+
+                    tfilbuste = line(-(self.joints3D[valeur_actuelle].position.x)/scale,-(self.joints3D[valeur_actuelle].position.y)/scale,(self.joints3D[valeur_actuelle].position.z)/scale,-(self.joints3D[valeur_suivante].position.x)/scale,-(self.joints3D[valeur_suivante].position.y)/scale,(self.joints3D[valeur_suivante].position.z)/scale,255,255,255,self.programColorBody)
+                    tfilbuste.draw()
+
+                for i in range(len(clesBusteEpaules) - 1):
+                    cle_actuelle = clesBusteEpaules[i]
+                    cle_suivante = clesBusteEpaules[i + 1]
+
+                    valeur_actuelle = JointConnexionEpauleBuste[cle_actuelle]
+                    valeur_suivante = JointConnexionEpauleBuste[cle_suivante]
+
+                    tfilbuste = line(-(self.joints3D[valeur_actuelle].position.x)/scale,-(self.joints3D[valeur_actuelle].position.y)/scale,(self.joints3D[valeur_actuelle].position.z)/scale,-(self.joints3D[valeur_suivante].position.x)/scale,-(self.joints3D[valeur_suivante].position.y)/scale,(self.joints3D[valeur_suivante].position.z)/scale,255,255,255,self.programColorBody)
+                    tfilbuste.draw()
+
+                for i in range(len(clesBusteJambes) - 1):
+                    cle_actuelle = clesBusteJambes[i]
+                    cle_suivante = clesBusteJambes[i + 1]
+
+                    valeur_actuelle = JointConnexionJambesBuste[cle_actuelle]
+                    valeur_suivante = JointConnexionJambesBuste[cle_suivante]
+
+                    tfilbuste = line(-(self.joints3D[valeur_actuelle].position.x)/scale,-(self.joints3D[valeur_actuelle].position.y)/scale,(self.joints3D[valeur_actuelle].position.z)/scale,-(self.joints3D[valeur_suivante].position.x)/scale,-(self.joints3D[valeur_suivante].position.y)/scale,(self.joints3D[valeur_suivante].position.z)/scale,255,255,255,self.programColorBody)
+                    tfilbuste.draw()
+
+                H = np.eye(4) #matrice homogene
+                H[3,0] = -self.joints3D[JointTete['tete']].position.x/scale
+                H[3,1] = -self.joints3D[JointTete['tete']].position.y/scale
+                H[3,2] = self.joints3D[JointTete['tete']].position.z/scale
+                self.programTextureTete['model'] = H
+
+                cubetete = CubeTexture(0.3,0.3,0.3,self.programTextureTete)
+                cubetete.draw()
 
 
-            clesBrasGauche = list(JointBrasGauche.keys())
-            clesBrasDroit = list(JointBrasDroit.keys())
-            clesJambeGauche = list(JointJambeGauche.keys())
-            clesJambeDroite = list(JointJambeDroite.keys())
-            clesTorse = list(JointBuste.keys())
-            clesTete = list(JointTete.keys())
-            clesBusteJambes = list(JointConnexionJambesBuste.keys())
-            clesBusteEpaules = list(JointConnexionEpauleBuste.keys())
 
-            for i in range(len(clesBrasGauche) - 1):
-                cle_actuelle = clesBrasGauche[i]
-                cle_suivante = clesBrasGauche[i + 1]
-
-                valeur_actuelle = JointBrasGauche[cle_actuelle]
-                valeur_suivante = JointBrasGauche[cle_suivante]
-
-                tfilbuste = line(-(self.joints3D[valeur_actuelle].position.x)/scale,-(self.joints3D[valeur_actuelle].position.y)/scale,(self.joints3D[valeur_actuelle].position.z)/scale,-(self.joints3D[valeur_suivante].position.x)/scale,-(self.joints3D[valeur_suivante].position.y)/scale,(self.joints3D[valeur_suivante].position.z)/scale,255,255,255,self.programColorBody)
-                tfilbuste.draw()
-
-            for i in range(len(clesBrasDroit) - 1):
-                cle_actuelle = clesBrasDroit[i]
-                cle_suivante = clesBrasDroit[i + 1]
-
-                valeur_actuelle = JointBrasDroit[cle_actuelle]
-                valeur_suivante = JointBrasDroit[cle_suivante]
-
-                tfilbuste = line(-(self.joints3D[valeur_actuelle].position.x)/scale,-(self.joints3D[valeur_actuelle].position.y)/scale,(self.joints3D[valeur_actuelle].position.z)/scale,-(self.joints3D[valeur_suivante].position.x)/scale,-(self.joints3D[valeur_suivante].position.y)/scale,(self.joints3D[valeur_suivante].position.z)/scale,255,255,255,self.programColorBody)
-                tfilbuste.draw()
-
-            for i in range(len(clesJambeGauche) - 1):
-                cle_actuelle = clesJambeGauche[i]
-                cle_suivante = clesJambeGauche[i + 1]
-
-                valeur_actuelle = JointJambeGauche[cle_actuelle]
-                valeur_suivante = JointJambeGauche[cle_suivante]
-
-                tfilbuste = line(-(self.joints3D[valeur_actuelle].position.x)/scale,-(self.joints3D[valeur_actuelle].position.y)/scale,(self.joints3D[valeur_actuelle].position.z)/scale,-(self.joints3D[valeur_suivante].position.x)/scale,-(self.joints3D[valeur_suivante].position.y)/scale,(self.joints3D[valeur_suivante].position.z)/scale,255,255,255,self.programColorBody)
-                tfilbuste.draw()
-
-            for i in range(len(clesJambeDroite) - 1):
-                cle_actuelle = clesJambeDroite[i]
-                cle_suivante = clesJambeDroite[i + 1]
-
-                valeur_actuelle = JointJambeDroite[cle_actuelle]
-                valeur_suivante = JointJambeDroite[cle_suivante]
-
-                tfilbuste = line(-(self.joints3D[valeur_actuelle].position.x)/scale,-(self.joints3D[valeur_actuelle].position.y)/scale,(self.joints3D[valeur_actuelle].position.z)/scale,-(self.joints3D[valeur_suivante].position.x)/scale,-(self.joints3D[valeur_suivante].position.y)/scale,(self.joints3D[valeur_suivante].position.z)/scale,255,255,255,self.programColorBody)
-                tfilbuste.draw()
-
-            for i in range(len(clesTorse) - 1):
-                cle_actuelle = clesTorse[i]
-                cle_suivante = clesTorse[i + 1]
-
-                valeur_actuelle = JointBuste[cle_actuelle]
-                valeur_suivante = JointBuste[cle_suivante]
-
-                tfilbuste = line(-(self.joints3D[valeur_actuelle].position.x)/scale,-(self.joints3D[valeur_actuelle].position.y)/scale,(self.joints3D[valeur_actuelle].position.z)/scale,-(self.joints3D[valeur_suivante].position.x)/scale,-(self.joints3D[valeur_suivante].position.y)/scale,(self.joints3D[valeur_suivante].position.z)/scale,255,255,255,self.programColorBody)
-                tfilbuste.draw()
-
-            for i in range(len(clesBusteEpaules) - 1):
-                cle_actuelle = clesBusteEpaules[i]
-                cle_suivante = clesBusteEpaules[i + 1]
-
-                valeur_actuelle = JointConnexionEpauleBuste[cle_actuelle]
-                valeur_suivante = JointConnexionEpauleBuste[cle_suivante]
-
-                tfilbuste = line(-(self.joints3D[valeur_actuelle].position.x)/scale,-(self.joints3D[valeur_actuelle].position.y)/scale,(self.joints3D[valeur_actuelle].position.z)/scale,-(self.joints3D[valeur_suivante].position.x)/scale,-(self.joints3D[valeur_suivante].position.y)/scale,(self.joints3D[valeur_suivante].position.z)/scale,255,255,255,self.programColorBody)
-                tfilbuste.draw()
-
-            for i in range(len(clesBusteJambes) - 1):
-                cle_actuelle = clesBusteJambes[i]
-                cle_suivante = clesBusteJambes[i + 1]
-
-                valeur_actuelle = JointConnexionJambesBuste[cle_actuelle]
-                valeur_suivante = JointConnexionJambesBuste[cle_suivante]
-
-                tfilbuste = line(-(self.joints3D[valeur_actuelle].position.x)/scale,-(self.joints3D[valeur_actuelle].position.y)/scale,(self.joints3D[valeur_actuelle].position.z)/scale,-(self.joints3D[valeur_suivante].position.x)/scale,-(self.joints3D[valeur_suivante].position.y)/scale,(self.joints3D[valeur_suivante].position.z)/scale,255,255,255,self.programColorBody)
-                tfilbuste.draw()
-
-            H = np.eye(4) #matrice homogene
-            H[3,0] = -self.joints3D[JointTete['tete']].position.x/scale
-            H[3,1] = -self.joints3D[JointTete['tete']].position.y/scale
-            H[3,2] = self.joints3D[JointTete['tete']].position.z/scale
-            self.programTextureTete['model'] = H
-
-            cubetete = CubeTexture(0.3,0.3,0.3,self.programTextureTete)
-            cubetete.draw()
-
-
-
-            point1= np.array([self.joints3D[JointBrasDroit['epaule droit']].position.x/scale, self.joints3D[JointBrasDroit['epaule droit']].position.y/scale, self.joints3D[JointBrasDroit['epaule droit']].position.z/scale])
-            point2= np.array([self.joints3D[JointBrasDroit['coude droit']].position.x/scale, self.joints3D[JointBrasDroit['coude droit']].position.y/scale, self.joints3D[JointBrasDroit['coude droit']].position.z/scale])
+            #point1= np.array([self.joints3D[JointBrasDroit['epaule droit']].position.x/scale, self.joints3D[JointBrasDroit['epaule droit']].position.y/scale, self.joints3D[JointBrasDroit['epaule droit']].position.z/scale])
+            #point2= np.array([self.joints3D[JointBrasDroit['coude droit']].position.x/scale, self.joints3D[JointBrasDroit['coude droit']].position.y/scale, self.joints3D[JointBrasDroit['coude droit']].position.z/scale])
  
-            #print(point1)
-            #print(point2)
+            ##print(point1)
+            ##print(point2)
 
-            d = distance(point1[0],point1[1],point1[2],point2[0],point2[1],point2[2])/2
+            #d = distance(point1[0],point1[1],point1[2],point2[0],point2[1],point2[2])/2
 
-            direction = np.array([self.joints3D[JointBrasDroit['epaule droit']].position.x/scale - self.joints3D[JointBrasDroit['coude droit']].position.x/scale , 
-                                  self.joints3D[JointBrasDroit['epaule droit']].position.y/scale - self.joints3D[JointBrasDroit['coude droit']].position.y/scale , 
-                                  self.joints3D[JointBrasDroit['epaule droit']].position.z/scale - self.joints3D[JointBrasDroit['coude droit']].position.z/scale])
-            ##for i in len(point1):
-            ##       direction[i] = point2[i]-point1[i]
-            #print(direction)
+            #direction = np.array([self.joints3D[JointBrasDroit['epaule droit']].position.x/scale - self.joints3D[JointBrasDroit['coude droit']].position.x/scale , 
+            #                      self.joints3D[JointBrasDroit['epaule droit']].position.y/scale - self.joints3D[JointBrasDroit['coude droit']].position.y/scale , 
+            #                      self.joints3D[JointBrasDroit['epaule droit']].position.z/scale - self.joints3D[JointBrasDroit['coude droit']].position.z/scale])
+            ###for i in len(point1):
+            ###       direction[i] = point2[i]-point1[i]
+            ##print(direction)
 
-            #directionX = self.joints3D[JointBrasDroit['coude droit']].position.x/scale - self.joints3D[JointBrasDroit['epaule droit']].position.x/scale
-            #directionY = self.joints3D[JointBrasDroit['coude droit']].position.y/scale - self.joints3D[JointBrasDroit['epaule droit']].position.y/scale
-            #directionZ = self.joints3D[JointBrasDroit['coude droit']].position.z/scale - self.joints3D[JointBrasDroit['epaule droit']].position.z/scale
-            #direction = np.array([directionX, directionY, directionZ])
-            #print(direction)
-            #print(0)
+            ##directionX = self.joints3D[JointBrasDroit['coude droit']].position.x/scale - self.joints3D[JointBrasDroit['epaule droit']].position.x/scale
+            ##directionY = self.joints3D[JointBrasDroit['coude droit']].position.y/scale - self.joints3D[JointBrasDroit['epaule droit']].position.y/scale
+            ##directionZ = self.joints3D[JointBrasDroit['coude droit']].position.z/scale - self.joints3D[JointBrasDroit['epaule droit']].position.z/scale
+            ##direction = np.array([directionX, directionY, directionZ])
+            ##print(direction)
+            ##print(0)
 
-            ##direction = point2-point1
-            H = np.eye(4) #matrice homogene
-            #on estime la matrice de rotation
-            H[0:3,0:3] = lookAt(direction[0],direction[1],direction[2])
-            H = np.transpose(H) #pour opengl
-            #on ajoute les translation
-            H[3,0] = self.joints3D[JointBrasDroit['epaule droit']].position.y/scale
-            H[3,1] = self.joints3D[JointBrasDroit['epaule droit']].position.z/scale
-            H[3,2] = self.joints3D[JointBrasDroit['epaule droit']].position.x/scale
-            #decalge de la 1/2 longueur de la aprtie du coprs
-            T = np.eye(4);
-            T[3,0]= d #decalage suivant x
-            H = np.matmul(T,H) #attention à l'ordre de multiplication
+            ###direction = point2-point1
+            #H = np.eye(4) #matrice homogene
+            ##on estime la matrice de rotation
+            #H[0:3,0:3] = lookAt(direction[0],direction[1],direction[2])
+            #H = np.transpose(H) #pour opengl
+            ##on ajoute les translation
+            #H[3,0] = self.joints3D[JointBrasDroit['epaule droit']].position.z/scale
+            #H[3,1] = -self.joints3D[JointBrasDroit['epaule droit']].position.y/scale
+            #H[3,2] = self.joints3D[JointBrasDroit['epaule droit']].position.x/scale
+            ##decalge de la 1/2 longueur de la aprtie du coprs
+            #T = np.eye(4);
+            #T[3,0]= d #decalage suivant x
+            #H = np.matmul(T,H) #attention à l'ordre de multiplication
 
-            self.programTexture['model'] = H
-            t3 = CylindreTexture(0.05,d,360,self.programTexture) #création d'un ligne en X couleur rouge 
-            t3.draw()
+            #self.programTexture['model'] = H
+            #t3 = CylindreTexture(0.05,d,360,self.programTexture) #création d'un ligne en X couleur rouge 
+            #t3.draw()
 
             
 
